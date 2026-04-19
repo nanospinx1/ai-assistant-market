@@ -155,10 +155,10 @@ export default function CustomBuilderPage() {
             <Wrench size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-[#F1F5F9]">
+            <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
               Build Your Custom AI Employee
             </h1>
-            <p className="text-[#94A3B8]">
+            <p style={{ color: "var(--text-secondary)" }}>
               Create a tailored AI employee for your specific business needs
             </p>
           </div>
@@ -169,39 +169,42 @@ export default function CustomBuilderPage() {
         {/* Form – 3 cols */}
         <div className="lg:col-span-3 space-y-6">
           {/* Basic Info */}
-          <div className="rounded-2xl p-6 space-y-6 bg-[#141B2D] border border-[#1E293B]">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#94A3B8]">
+          <div className="rounded-2xl p-6 space-y-6" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
               Basic Info
             </h3>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#94A3B8]">Employee Name</label>
+              <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>Employee Name</label>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. DataBot Pro"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+                className="w-full px-4 py-3 rounded-xl outline-none placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#94A3B8]">Role / Title</label>
+              <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>Role / Title</label>
               <input
                 type="text"
                 value={form.role}
                 onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
                 placeholder="e.g. Senior Data Analyst"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+                className="w-full px-4 py-3 rounded-xl outline-none placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#94A3B8]">Category</label>
+              <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>Category</label>
               <select
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl outline-none bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] focus:border-indigo-500 transition-colors"
+                className="w-full px-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               >
                 <option value="">Select a category</option>
                 {CATEGORIES.map((cat) => (
@@ -212,11 +215,11 @@ export default function CustomBuilderPage() {
           </div>
 
           {/* Avatar Icon Picker */}
-          <div className="rounded-2xl p-6 space-y-4 bg-[#141B2D] border border-[#1E293B]">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#94A3B8]">
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
               Avatar
             </h3>
-            <p className="text-xs text-[#64748B]">Select a category above to preview the icon, or choose one below:</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Select a category above to preview the icon, or choose one below:</p>
             <div className="flex flex-wrap gap-3">
               {CATEGORIES.map((cat) => {
                 const Icon = categoryIcons[cat];
@@ -229,11 +232,12 @@ export default function CustomBuilderPage() {
                     className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-200 border ${
                       active
                         ? `bg-gradient-to-br ${gradient} border-transparent shadow-lg scale-110`
-                        : "bg-[#0B1120] border-[#1E293B] hover:border-[#334155]"
+                        : ""
                     }`}
+                    style={!active ? { background: "var(--bg-primary)", borderColor: "var(--border-primary)" } : undefined}
                     title={cat}
                   >
-                    <Icon size={24} className={active ? "text-white" : "text-[#64748B]"} />
+                    <Icon size={24} className={active ? "text-white" : ""} style={!active ? { color: "var(--text-muted)" } : undefined} />
                   </button>
                 );
               })}
@@ -241,8 +245,8 @@ export default function CustomBuilderPage() {
           </div>
 
           {/* Description */}
-          <div className="rounded-2xl p-6 space-y-4 bg-[#141B2D] border border-[#1E293B]">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#94A3B8]">
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
               Description
             </h3>
             <textarea
@@ -250,13 +254,14 @@ export default function CustomBuilderPage() {
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               placeholder="Describe what this AI employee does..."
               rows={4}
-              className="w-full px-4 py-3 rounded-xl outline-none resize-none bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+              className="w-full px-4 py-3 rounded-xl outline-none resize-none placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+              style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
             />
           </div>
 
           {/* Capabilities */}
-          <div className="rounded-2xl p-6 space-y-4 bg-[#141B2D] border border-[#1E293B]">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#94A3B8]">
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
               Capabilities
             </h3>
             <div className="flex gap-2">
@@ -266,7 +271,8 @@ export default function CustomBuilderPage() {
                 onChange={(e) => setCapInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCapability())}
                 placeholder="Add a capability and press Enter"
-                className="flex-1 px-4 py-2.5 rounded-xl outline-none text-sm bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl outline-none text-sm placeholder-[#64748B] focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
               <button
                 onClick={addCapability}
@@ -292,13 +298,14 @@ export default function CustomBuilderPage() {
             )}
             {/* Suggested */}
             <div>
-              <p className="text-xs text-[#64748B] mb-2">Suggested:</p>
+              <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>Suggested:</p>
               <div className="flex flex-wrap gap-2">
                 {SUGGESTED_CAPS.filter((s) => !form.capabilities.includes(s)).map((s) => (
                   <button
                     key={s}
                     onClick={() => setForm((f) => ({ ...f, capabilities: [...f.capabilities, s] }))}
-                    className="px-3 py-1 rounded-full text-xs bg-[#0B1120] border border-[#1E293B] text-[#94A3B8] hover:border-indigo-500 hover:text-indigo-300 transition-colors"
+                    className="px-3 py-1 rounded-full text-xs hover:border-indigo-500 hover:text-indigo-300 transition-colors"
+                    style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-secondary)" }}
                   >
                     + {s}
                   </button>
@@ -308,22 +315,23 @@ export default function CustomBuilderPage() {
           </div>
 
           {/* Pricing */}
-          <div className="rounded-2xl p-6 space-y-4 bg-[#141B2D] border border-[#1E293B]">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#94A3B8]">
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
               Pricing
             </h3>
             <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold text-[#F1F5F9]">$</span>
+              <span className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>$</span>
               <input
                 type="number"
                 value={form.price}
                 onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) }))}
                 min={0}
-                className="w-32 px-4 py-3 rounded-xl outline-none bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] focus:border-indigo-500 transition-colors"
+                className="w-32 px-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
-              <span className="text-sm text-[#64748B]">/month</span>
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>/month</span>
             </div>
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
               Auto-calculated: $49 base + $25 per capability ({form.capabilities.length} capabilities)
             </p>
           </div>
@@ -352,12 +360,12 @@ export default function CustomBuilderPage() {
           <div className="sticky top-8 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Eye size={18} className="text-emerald-400" />
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-[#94A3B8]">
+              <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
                 Marketplace Preview
               </h3>
             </div>
 
-            <div className="rounded-2xl overflow-hidden bg-[#141B2D] border border-[#1E293B] hover:border-[#334155] transition-all duration-200">
+            <div className="rounded-2xl overflow-hidden transition-all duration-200" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
               {/* Preview Header with Icon */}
               <div className={`h-28 bg-gradient-to-br ${selectedGradient} flex items-center justify-center relative`}>
                 <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -366,10 +374,10 @@ export default function CustomBuilderPage() {
               </div>
               <div className="p-5 space-y-3">
                 <div>
-                  <h4 className="text-lg font-bold text-[#F1F5F9]">
+                  <h4 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
                     {form.name || "Employee Name"}
                   </h4>
-                  <p className="text-sm text-[#94A3B8]">
+                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
                     {form.role || "Role / Title"}
                   </p>
                 </div>
@@ -380,7 +388,7 @@ export default function CustomBuilderPage() {
                   </span>
                 )}
 
-                <p className="text-sm leading-relaxed text-[#64748B]">
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
                   {form.description || "Description will appear here..."}
                 </p>
 
@@ -389,7 +397,8 @@ export default function CustomBuilderPage() {
                     {form.capabilities.map((cap) => (
                       <span
                         key={cap}
-                        className="px-2 py-0.5 rounded text-xs bg-[#0B1120] text-[#94A3B8]"
+                        className="px-2 py-0.5 rounded text-xs"
+                        style={{ background: "var(--bg-primary)", color: "var(--text-secondary)" }}
                       >
                         {cap}
                       </span>
@@ -397,12 +406,12 @@ export default function CustomBuilderPage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-3 border-t border-[#1E293B]">
+                <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: "var(--border-primary)" }}>
                   <div>
-                    <span className="text-xl font-bold text-[#F1F5F9]">
+                    <span className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
                       ${form.price}
                     </span>
-                    <span className="text-sm text-[#64748B]">/mo</span>
+                    <span className="text-sm" style={{ color: "var(--text-muted)" }}>/mo</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Sparkles size={14} className="text-amber-400" />

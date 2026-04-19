@@ -95,14 +95,14 @@ function colorForPercentRaw(val: number, thresholds: [number, number] = [95, 90]
 function LoadingSkeleton() {
   return (
     <div className="space-y-8 animate-pulse">
-      <div className="h-9 w-64 rounded-lg bg-[#141B2D]" />
+      <div className="h-9 w-64 rounded-lg" style={{ background: "var(--bg-card)" }} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-32 rounded-2xl bg-[#141B2D]" />
+          <div key={i} className="h-32 rounded-2xl" style={{ background: "var(--bg-card)" }} />
         ))}
       </div>
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="h-24 rounded-xl bg-[#141B2D]" />
+        <div key={i} className="h-24 rounded-xl" style={{ background: "var(--bg-card)" }} />
       ))}
     </div>
   );
@@ -124,13 +124,13 @@ function CategoryIcon({ category, size = "md" }: { category?: string; size?: "sm
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl p-3 bg-[#141B2D] border border-[#1E293B] shadow-xl">
-      <p className="text-xs font-medium text-[#94A3B8] mb-2">{label}</p>
+    <div className="rounded-xl p-3 border shadow-xl" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+      <p className="text-xs font-medium mb-2" style={{ color: "var(--text-secondary)" }}>{label}</p>
       {payload.map((entry: any) => (
         <div key={entry.name} className="flex items-center gap-2 text-xs">
           <div className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
-          <span className="text-[#94A3B8]">{entry.name}:</span>
-          <span className="text-[#F1F5F9] font-medium">{entry.value}</span>
+          <span style={{ color: "var(--text-secondary)" }}>{entry.name}:</span>
+          <span className="font-medium" style={{ color: "var(--text-primary)" }}>{entry.value}</span>
         </div>
       ))}
     </div>
@@ -239,10 +239,10 @@ export default function PerformancePage() {
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#F1F5F9]">
+        <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
           Performance Analytics
         </h1>
-        <p className="mt-1 text-[#94A3B8]">
+        <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
           Monitor and analyze your AI team&apos;s performance in real time
         </p>
       </div>
@@ -254,7 +254,8 @@ export default function PerformancePage() {
           return (
             <div
               key={card.label}
-              className="rounded-2xl p-6 bg-[#141B2D] border border-[#1E293B] hover:bg-[#1C2640] transition-all duration-200"
+              className="rounded-2xl p-6 transition-all duration-200"
+              style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-lg ${card.shadow}`}>
@@ -262,10 +263,10 @@ export default function PerformancePage() {
                 </div>
                 <TrendingUp size={14} className="text-emerald-400" />
               </div>
-              <p className="text-2xl font-bold text-[#F1F5F9]">
+              <p className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
                 {card.value}
               </p>
-              <p className="text-sm mt-1 text-[#94A3B8]">
+              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                 {card.label}
               </p>
             </div>
@@ -275,16 +276,16 @@ export default function PerformancePage() {
 
       {/* Per-deployment Performance */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 text-[#F1F5F9]">
+        <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
           Performance by Employee
         </h2>
 
         {deployments.length === 0 ? (
-          <div className="rounded-2xl p-10 text-center bg-[#141B2D] border border-[#1E293B]">
+          <div className="rounded-2xl p-10 text-center" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
               <Zap size={28} className="text-white" />
             </div>
-            <p className="text-[#94A3B8]">
+            <p style={{ color: "var(--text-secondary)" }}>
               No deployment performance data available yet.
             </p>
           </div>
@@ -294,51 +295,52 @@ export default function PerformancePage() {
               <div key={dep.id}>
                 <button
                   onClick={() => handleExpand(dep.id)}
-                  className="w-full rounded-xl p-5 flex items-center gap-5 bg-[#141B2D] border border-[#1E293B] hover:bg-[#1C2640] hover:border-[#334155] transition-all duration-200 text-left"
+                  className="w-full rounded-xl p-5 flex items-center gap-5 transition-all duration-200 text-left"
+                  style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}
                 >
                   <CategoryIcon category={dep.employeeCategory} size="sm" />
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate text-[#F1F5F9]">
+                    <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                       {dep.name}
                     </p>
                     {dep.employeeName && (
-                      <p className="text-xs text-[#64748B]">{dep.employeeName}</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>{dep.employeeName}</p>
                     )}
                   </div>
 
                   {/* Metric columns */}
                   <div className="hidden sm:flex items-center gap-8 text-sm">
                     <div className="text-center min-w-[60px]">
-                      <p className="font-semibold text-[#F1F5F9]">{dep.avgTasks}</p>
-                      <p className="text-xs text-[#64748B]">Tasks/day</p>
+                      <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgTasks}</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Tasks/day</p>
                     </div>
                     <div className="text-center min-w-[70px]">
-                      <p className="font-semibold text-[#F1F5F9]">{dep.avgResponseTime}</p>
-                      <p className="text-xs text-[#64748B]">Resp. Time</p>
+                      <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgResponseTime}</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Resp. Time</p>
                     </div>
                     <div className="text-center min-w-[60px]">
                       <p className={`font-semibold ${colorForPercent(dep.avgAccuracy)}`}>
                         {dep.avgAccuracy}%
                       </p>
-                      <p className="text-xs text-[#64748B]">Accuracy</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Accuracy</p>
                     </div>
                     <div className="text-center min-w-[60px]">
                       <p className={`font-semibold ${colorForPercent(dep.avgUptime)}`}>
                         {dep.avgUptime}%
                       </p>
-                      <p className="text-xs text-[#64748B]">Uptime</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Uptime</p>
                     </div>
                   </div>
 
-                  <div className="text-[#64748B]">
+                  <div style={{ color: "var(--text-muted)" }}>
                     {expanded === dep.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </div>
                 </button>
 
                 {/* Expanded Chart */}
                 {expanded === dep.id && (
-                  <div className="rounded-b-xl p-6 -mt-1 bg-[#111827] border border-t-0 border-[#1E293B]">
+                  <div className="rounded-b-xl p-6 -mt-1 border border-t-0" style={{ background: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
                     {chartLoading ? (
                       <div className="flex items-center justify-center h-48">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500" />
@@ -389,7 +391,7 @@ export default function PerformancePage() {
                         </ResponsiveContainer>
                       </div>
                     ) : (
-                      <p className="text-center py-8 text-[#64748B]">
+                      <p className="text-center py-8" style={{ color: "var(--text-muted)" }}>
                         No chart data available for this deployment.
                       </p>
                     )}

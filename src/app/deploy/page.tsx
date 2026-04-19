@@ -71,11 +71,11 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
-        <div className="h-9 w-56 rounded-lg bg-[#141B2D]" />
-        <div className="h-10 w-36 rounded-lg bg-[#141B2D]" />
+        <div className="h-9 w-56 rounded-lg" style={{ background: "var(--bg-card)" }} />
+        <div className="h-10 w-36 rounded-lg" style={{ background: "var(--bg-card)" }} />
       </div>
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-20 rounded-xl bg-[#141B2D]" />
+        <div key={i} className="h-20 rounded-xl" style={{ background: "var(--bg-card)" }} />
       ))}
     </div>
   );
@@ -152,10 +152,10 @@ export default function DeploymentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F1F5F9]">
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
             Your Deployments
           </h1>
-          <p className="mt-1 text-[#94A3B8]">
+          <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
             Manage and monitor your AI employee deployments
           </p>
         </div>
@@ -169,19 +169,19 @@ export default function DeploymentsPage() {
 
       {/* Summary stats bar */}
       {deployments.length > 0 && (
-        <div className="flex items-center gap-3 text-sm px-4 py-2.5 rounded-xl border border-[#1E293B]" style={{ background: "#141B2D" }}>
-          <span className="text-[#94A3B8] font-medium">
+        <div className="flex items-center gap-3 text-sm px-4 py-2.5 rounded-xl" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+          <span className="font-medium" style={{ color: "var(--text-secondary)" }}>
             {deployments.length} Total
           </span>
-          <span className="text-[#1E293B]">·</span>
+          <span style={{ color: "var(--border-primary)" }}>·</span>
           <span className="text-emerald-400 font-medium">
             {deployments.filter(d => d.status === "active").length} Active
           </span>
-          <span className="text-[#1E293B]">·</span>
+          <span style={{ color: "var(--border-primary)" }}>·</span>
           <span className="text-amber-400 font-medium">
             {deployments.filter(d => d.status === "paused").length} Paused
           </span>
-          <span className="text-[#1E293B]">·</span>
+          <span style={{ color: "var(--border-primary)" }}>·</span>
           <span className="text-red-400 font-medium">
             {deployments.filter(d => d.status === "stopped").length} Stopped
           </span>
@@ -190,14 +190,14 @@ export default function DeploymentsPage() {
 
       {/* Empty State */}
       {deployments.length === 0 ? (
-        <div className="rounded-2xl p-14 text-center bg-[#141B2D] border border-[#1E293B]">
+        <div className="rounded-2xl p-14 text-center" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/20">
             <Rocket size={36} className="text-white" />
           </div>
-          <h3 className="text-xl font-semibold mb-2 text-[#F1F5F9]">
+          <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
             No deployments yet
           </h3>
-          <p className="mb-8 text-[#94A3B8] max-w-md mx-auto">
+          <p className="mb-8 max-w-md mx-auto" style={{ color: "var(--text-secondary)" }}>
             Head to the marketplace to hire and deploy your first AI employee. Get started in minutes.
           </p>
           <Link
@@ -214,8 +214,8 @@ export default function DeploymentsPage() {
             return (
             <div
               key={dep.id}
-              className="rounded-xl p-5 bg-[#141B2D] border border-[#1E293B] hover:bg-[#1C2640] hover:border-[#334155] transition-all duration-200"
-              style={{ borderLeft: `3px solid ${catColor}` }}
+              className="rounded-xl p-5 card-hover transition-all duration-200"
+              style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)", borderLeft: `3px solid ${catColor}` }}
             >
               <div className="flex items-center gap-5 flex-wrap">
               {/* Category Icon */}
@@ -223,13 +223,13 @@ export default function DeploymentsPage() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate text-[#F1F5F9]">
+                <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                   {dep.name}
                 </p>
-                <p className="text-sm truncate text-[#94A3B8]">
+                <p className="text-sm truncate" style={{ color: "var(--text-secondary)" }}>
                   {dep.employeeName}
                   {dep.employeeRole && (
-                    <span className="text-[#64748B]"> &middot; {dep.employeeRole}</span>
+                    <span style={{ color: "var(--text-muted)" }}> &middot; {dep.employeeRole}</span>
                   )}
                 </p>
               </div>
@@ -240,7 +240,7 @@ export default function DeploymentsPage() {
               </span>
 
               {/* Deployed Date */}
-              <p className="text-sm hidden sm:block whitespace-nowrap text-[#64748B]">
+              <p className="text-sm hidden sm:block whitespace-nowrap" style={{ color: "var(--text-muted)" }}>
                 {(dep.deployedAt || dep.deployed_at)
                   ? new Date((dep.deployedAt || dep.deployed_at)!).toLocaleDateString("en-US", {
                       month: "short",
@@ -289,18 +289,18 @@ export default function DeploymentsPage() {
               </div>
 
               {/* Quick stats row */}
-              <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#1E293B]">
-                <div className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+              <div className="flex items-center gap-4 mt-3 pt-3 border-t" style={{ borderColor: "var(--border-primary)" }}>
+                <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Tasks: <span className="font-semibold text-[#F1F5F9]">{Math.floor(Math.random() * 80 + 20)}</span>
+                  Tasks: <span className="font-semibold" style={{ color: "var(--text-primary)" }}>{Math.floor(Math.random() * 80 + 20)}</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+                <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  Accuracy: <span className="font-semibold text-[#F1F5F9]">{Math.floor(Math.random() * 10 + 90)}%</span>
+                  Accuracy: <span className="font-semibold" style={{ color: "var(--text-primary)" }}>{Math.floor(Math.random() * 10 + 90)}%</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+                <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                  Uptime: <span className="font-semibold text-[#F1F5F9]">{(Math.random() * 2 + 97.5).toFixed(1)}%</span>
+                  Uptime: <span className="font-semibold" style={{ color: "var(--text-primary)" }}>{(Math.random() * 2 + 97.5).toFixed(1)}%</span>
                 </div>
               </div>
             </div>
