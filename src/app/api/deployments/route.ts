@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
+import { requireAuth } from "@/lib/auth";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
+  const { user, error } = await requireAuth();
+  if (error) return error;
+
   seedDatabase();
   const db = getDb();
-  const userId = req.nextUrl.searchParams.get("userId");
-  if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+  const userId = user.id;
 
   const deployments = db.prepare(`
     SELECT d.*, e.name as employee_name, e.role as employee_role, e.avatar as employee_avatar, e.category as employee_category
@@ -31,22 +34,32 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, error } = await requireAuth();
+  if (error) return error;
+
   const body = await req.json();
   const db = getDb();
-  const { id, user_id, employee_id, name, config } = body;
+  const { id, employee_id, name, config } = body;
 
   db.prepare(`
     INSERT INTO deployments (id, user_id, employee_id, name, status, config)
     VALUES (?, ?, ?, ?, 'configuring', ?)
-  `).run(id, user_id, employee_id, name, JSON.stringify(config));
+  `).run(id, user.id, employee_id, name, JSON.stringify(config));
 
   return NextResponse.json({ success: true, id });
 }
 
 export async function PATCH(req: NextRequest) {
+  const { user, error } = await requireAuth();
+  if (error) return error;
+
   const body = await req.json();
   const db = getDb();
   const { id, status } = body;
+
+  // Verify ownership
+  const dep = db.prepare("SELECT * FROM deployments WHERE id = ? AND user_id = ?").get(id, user.id);
+  if (!dep) return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
 
   if (status === "active") {
     db.prepare("UPDATE deployments SET status = ?, deployed_at = datetime('now') WHERE id = ?").run(status, id);

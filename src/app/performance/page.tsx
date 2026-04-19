@@ -156,7 +156,7 @@ export default function PerformancePage() {
   const fetchSummary = useCallback(async () => {
     if (!user?.id) return;
     try {
-      const res = await fetch(`/api/performance?userId=${user.id}`);
+      const res = await fetch(`/api/performance`);
       if (res.ok) {
         const data = await res.json();
         // API returns flat array of deployment performance objects

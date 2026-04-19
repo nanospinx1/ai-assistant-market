@@ -34,6 +34,11 @@ export function seedDatabase() {
     );
   }
 
+  // Set agent_type for known agents
+  db.prepare("UPDATE ai_employees SET agent_type = 'customer-support' WHERE id = 'emp-customer-support'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'data-analyst' WHERE id = 'emp-data-analyst'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'content-writer' WHERE id = 'emp-content-writer'").run();
+
   // Create some demo deployments and purchases for the first user
   const userId = demoUsers[0].id;
   const deployments = [

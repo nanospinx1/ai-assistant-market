@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET() {
   seedDatabase();
@@ -15,14 +16,17 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, error } = await requireAuth();
+  if (error) return error;
+
   const body = await req.json();
   const db = getDb();
-  const { id, name, role, category, description, long_description, capabilities, price_monthly, price_yearly, avatar, created_by } = body;
+  const { id, name, role, category, description, long_description, capabilities, price_monthly, price_yearly, avatar } = body;
 
   db.prepare(`
     INSERT INTO ai_employees (id, name, role, category, description, long_description, capabilities, price_monthly, price_yearly, avatar, is_prebuilt, created_by)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
-  `).run(id, name, role, category, description, long_description, JSON.stringify(capabilities), price_monthly, price_yearly, avatar, created_by);
+  `).run(id, name, role, category, description, long_description, JSON.stringify(capabilities), price_monthly, price_yearly, avatar, user.id);
 
   return NextResponse.json({ success: true, id });
 }

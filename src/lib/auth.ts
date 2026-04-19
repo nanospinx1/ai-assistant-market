@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
 
@@ -48,6 +49,39 @@ export async function getSession(): Promise<SessionUser | null> {
 export async function destroySession() {
   const cookieStore = await cookies();
   cookieStore.delete("session-token");
+}
+
+/**
+ * Require authentication for API routes.
+ * Returns the session user or a 401 response.
+ */
+export async function requireAuth(): Promise<
+  { user: SessionUser; error?: never } | { user?: never; error: NextResponse }
+> {
+  const user = await getSession();
+  if (!user) {
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+  return { user };
+}
+
+/**
+ * Verify that a deployment belongs to the authenticated user.
+ * Returns the deployment row or a 404 response.
+ */
+export function verifyDeploymentOwnership(
+  deploymentId: string,
+  userId: string
+): { deployment: any; error?: never } | { deployment?: never; error: NextResponse } {
+  const db = getDb();
+  const deployment = db
+    .prepare("SELECT * FROM deployments WHERE id = ? AND user_id = ?")
+    .get(deploymentId, userId) as any;
+
+  if (!deployment) {
+    return { error: NextResponse.json({ error: "Deployment not found" }, { status: 404 }) };
+  }
+  return { deployment };
 }
 
 export function initializeDb() {

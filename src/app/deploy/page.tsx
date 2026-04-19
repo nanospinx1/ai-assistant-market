@@ -10,6 +10,7 @@ import {
   Pause,
   Square,
   Plus,
+  MessageSquare,
   Headphones,
   TrendingUp,
   Palette,
@@ -109,7 +110,7 @@ export default function DeploymentsPage() {
   const fetchDeployments = useCallback(async () => {
     if (!user?.id) return;
     try {
-      const res = await fetch(`/api/deployments?userId=${user.id}`);
+      const res = await fetch(`/api/deployments`);
       if (res.ok) {
         const data = await res.json();
         setDeployments(data.deployments ?? data);
@@ -258,6 +259,15 @@ export default function DeploymentsPage() {
 
               {/* Actions */}
               <div className="flex items-center gap-2">
+                {dep.status === "active" && (
+                  <button
+                    onClick={() => router.push(`/deploy/${dep.id}/chat`)}
+                    className="w-9 h-9 rounded-full bg-[var(--primary)]/15 hover:bg-[var(--primary)]/30 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                    title="Chat with agent"
+                  >
+                    <MessageSquare size={15} className="text-[var(--primary)]" />
+                  </button>
+                )}
                 {dep.status === "active" && (
                   <button
                     onClick={() => handleAction(dep.id, "paused")}

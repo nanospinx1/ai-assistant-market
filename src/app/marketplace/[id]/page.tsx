@@ -23,6 +23,8 @@ import {
   Award,
   Heart,
   Briefcase,
+  Globe,
+  Loader2,
 } from "lucide-react";
 import { AIEmployee } from "@/lib/types";
 
@@ -78,6 +80,8 @@ export default function EmployeeDetailPage() {
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<"monthly" | "yearly">("monthly");
   const [purchasing, setPurchasing] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<"idle" | "submitted" | "already" | "error">("idle");
 
   const id = params.id as string;
 
@@ -102,7 +106,6 @@ export default function EmployeeDetailPage() {
         body: JSON.stringify({
           employee_id: employee.id,
           plan,
-          user_id: user.id || user.email,
         }),
       });
       if (res.ok) {
@@ -114,6 +117,34 @@ export default function EmployeeDetailPage() {
       setPurchasing(false);
     }
   };
+
+  const handlePublish = async () => {
+    if (!user || !employee) return;
+    setPublishing(true);
+    try {
+      const res = await fetch("/api/marketplace/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employee_id: employee.id }),
+      });
+      if (res.ok) {
+        setPublishStatus("submitted");
+      } else {
+        const data = await res.json();
+        if (data.error?.includes("already")) {
+          setPublishStatus("already");
+        } else {
+          setPublishStatus("error");
+        }
+      }
+    } catch {
+      setPublishStatus("error");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const isOwnEmployee = user && employee?.created_by === user.id;
 
   if (loading) {
     return (
@@ -371,6 +402,47 @@ export default function EmployeeDetailPage() {
             <p className="text-center text-xs text-[var(--text-muted)] mt-3">
               30-day money-back guarantee
             </p>
+
+            {/* Publish to Marketplace — only for own custom employees */}
+            {isOwnEmployee && (
+              <div className="mt-5 pt-5 border-t border-[var(--border)]">
+                {publishStatus === "submitted" ? (
+                  <div className="text-center py-2">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 text-sm font-medium border border-emerald-500/20">
+                      <Check size={16} />
+                      Submitted for Review
+                    </div>
+                    <p className="text-xs text-[var(--text-muted)] mt-2">
+                      Your agent will appear in the global marketplace once approved.
+                    </p>
+                  </div>
+                ) : publishStatus === "already" ? (
+                  <div className="text-center py-2">
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Already submitted for marketplace review.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handlePublish}
+                    disabled={publishing}
+                    className="w-full py-3 rounded-xl bg-[var(--bg-dark)] border border-[var(--border)] text-[var(--text-secondary)] font-medium text-sm hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {publishing ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Globe size={16} />
+                        Publish to Global Marketplace
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

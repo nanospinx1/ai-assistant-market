@@ -1,88 +1,93 @@
 import Database from "better-sqlite3";
 import path from "path";
+import fs from "fs";
 
 const DB_PATH = path.join(process.cwd(), "data", "app.db");
+const MIGRATIONS_DIR = path.join(process.cwd(), "data", "migrations");
 
 let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
   if (!db) {
-    const fs = require("fs");
     const dir = path.dirname(DB_PATH);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
     db = new Database(DB_PATH);
     db.pragma("journal_mode = WAL");
     db.pragma("foreign_keys = ON");
-    initDb(db);
+    runMigrations(db);
   }
   return db;
 }
 
-function initDb(db: Database.Database) {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      name TEXT NOT NULL,
-      password TEXT NOT NULL,
-      company TEXT,
-      avatar TEXT,
-      created_at TEXT DEFAULT (datetime('now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS ai_employees (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      role TEXT NOT NULL,
-      category TEXT NOT NULL,
-      description TEXT NOT NULL,
-      long_description TEXT,
-      capabilities TEXT, -- JSON array
-      price_monthly REAL NOT NULL,
-      price_yearly REAL,
-      rating REAL DEFAULT 0,
-      reviews_count INTEGER DEFAULT 0,
-      avatar TEXT,
-      status TEXT DEFAULT 'available',
-      is_prebuilt INTEGER DEFAULT 1,
-      created_by TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (created_by) REFERENCES users(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS deployments (
-      id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      employee_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      status TEXT DEFAULT 'configuring', -- configuring, deploying, active, paused, stopped
-      config TEXT, -- JSON config
-      deployed_at TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (employee_id) REFERENCES ai_employees(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS performance_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      deployment_id TEXT NOT NULL,
-      metric_type TEXT NOT NULL, -- tasks_completed, response_time, accuracy, uptime
-      value REAL NOT NULL,
-      recorded_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (deployment_id) REFERENCES deployments(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS purchases (
-      id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      employee_id TEXT NOT NULL,
-      plan TEXT NOT NULL, -- monthly, yearly
-      amount REAL NOT NULL,
-      status TEXT DEFAULT 'active',
-      purchased_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (employee_id) REFERENCES ai_employees(id)
+/**
+ * Simple migration runner.
+ * Tracks applied migrations in a `schema_migrations` table.
+ * Migration files are numbered SQL files in data/migrations/.
+ */
+function runMigrations(database: Database.Database) {
+  // Ensure migration tracking table exists
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      version TEXT PRIMARY KEY,
+      applied_at TEXT DEFAULT (datetime('now'))
     );
   `);
+
+  // Read available migration files
+  if (!fs.existsSync(MIGRATIONS_DIR)) return;
+
+  const files = fs
+    .readdirSync(MIGRATIONS_DIR)
+    .filter((f: string) => f.endsWith(".sql"))
+    .sort();
+
+  // Get already-applied versions
+  const applied = new Set(
+    database
+      .prepare("SELECT version FROM schema_migrations")
+      .all()
+      .map((row: any) => row.version)
+  );
+
+  // Apply pending migrations in order
+  for (const file of files) {
+    const version = file.replace(".sql", "");
+    if (applied.has(version)) continue;
+
+    const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, file), "utf-8");
+
+    database.transaction(() => {
+      // Split on semicolons and execute each statement
+      const statements = sql
+        .split(";")
+        .map((s: string) => {
+          // Strip leading comment lines from each chunk
+          const lines = s.split("\n");
+          const nonCommentLines = lines.filter(
+            (line: string) => !line.trim().startsWith("--") && line.trim().length > 0
+          );
+          return nonCommentLines.join("\n").trim();
+        })
+        .filter((s: string) => s.length > 0);
+
+      for (const stmt of statements) {
+        try {
+          database.exec(stmt + ";");
+        } catch (err: any) {
+          // Ignore "duplicate column" errors from re-running ALTER TABLE
+          if (err.message?.includes("duplicate column")) continue;
+          // Ignore "already exists" errors for CREATE IF NOT EXISTS idempotency
+          if (err.message?.includes("already exists")) continue;
+          throw err;
+        }
+      }
+
+      database
+        .prepare("INSERT INTO schema_migrations (version) VALUES (?)")
+        .run(version);
+    })();
+
+    console.log(`[migration] Applied: ${file}`);
+  }
 }

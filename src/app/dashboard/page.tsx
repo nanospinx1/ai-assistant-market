@@ -127,8 +127,8 @@ export default function DashboardPage() {
     async function fetchData() {
       try {
         const [deploymentsRes, performanceRes] = await Promise.all([
-          fetch(`/api/deployments?userId=${user!.id}`),
-          fetch(`/api/performance?userId=${user!.id}`),
+          fetch(`/api/deployments`),
+          fetch(`/api/performance`),
         ]);
 
         if (deploymentsRes.ok && performanceRes.ok) {
