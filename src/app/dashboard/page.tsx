@@ -31,14 +31,22 @@ const categoryIconMap: Record<string, { icon: LucideIcon; gradient: string }> = 
   "Finance":          { icon: Calculator, gradient: "linear-gradient(135deg, #F59E0B, #FBBF24)" },
   "Analytics":        { icon: BarChart3,  gradient: "linear-gradient(135deg, #06B6D4, #67E8F9)" },
   "Marketing":        { icon: Palette,    gradient: "linear-gradient(135deg, #EC4899, #F472B6)" },
+  "Human Resources":  { icon: Users,      gradient: "linear-gradient(135deg, #8B5CF6, #A78BFA)" },
   "HR":               { icon: Users,      gradient: "linear-gradient(135deg, #8B5CF6, #A78BFA)" },
+  "IT Support":       { icon: Monitor,    gradient: "linear-gradient(135deg, #3B82F6, #60A5FA)" },
   "IT":               { icon: Monitor,    gradient: "linear-gradient(135deg, #3B82F6, #60A5FA)" },
   "Operations":       { icon: Settings,   gradient: "linear-gradient(135deg, #EF4444, #F87171)" },
 };
 
-function getCategoryVisual(role: string) {
+function getCategoryVisual(category: string, role?: string) {
+  // Try exact category match first, then fall back to role keyword matching
   for (const [key, val] of Object.entries(categoryIconMap)) {
-    if (role.toLowerCase().includes(key.toLowerCase())) return val;
+    if (category.toLowerCase().includes(key.toLowerCase())) return val;
+  }
+  if (role) {
+    for (const [key, val] of Object.entries(categoryIconMap)) {
+      if (role.toLowerCase().includes(key.toLowerCase())) return val;
+    }
   }
   return { icon: Briefcase, gradient: "linear-gradient(135deg, #4F46E5, #7C3AED)" };
 }
@@ -46,9 +54,11 @@ function getCategoryVisual(role: string) {
 /* ── Types ── */
 interface Deployment {
   id: string;
+  name: string;
   employeeName: string;
   employeeRole: string;
   employeeAvatar: string;
+  employeeCategory: string;
   status: "active" | "paused" | "stopped";
   accuracy: number;
   tasksCompleted: number;
@@ -304,7 +314,7 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {deployments.map((dep) => {
-                const { icon: CategoryIcon, gradient } = getCategoryVisual(dep.employeeRole);
+                const { icon: CategoryIcon, gradient } = getCategoryVisual(dep.employeeCategory || "", dep.employeeRole);
                 const gradientColor = gradient.match(/#[A-Fa-f0-9]{6}/)?.[0] ?? "#4F46E5";
                 return (
                   <div
@@ -324,10 +334,10 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold truncate text-[var(--text-primary)]">
-                        {dep.employeeRole}
+                        {dep.name || dep.employeeRole}
                       </p>
                       <p className="text-sm truncate text-[var(--text-secondary)]">
-                        {dep.employeeName}
+                        {dep.employeeRole} · {dep.employeeName}
                       </p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">
                         Last active: {dep.status === "active" ? "Just now" : "2h ago"}
