@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
 import { requireAuth } from "@/lib/auth";
+import { recommendModel } from "@/lib/agents/model-recommender";
 
 export async function GET() {
   const { user, error } = await requireAuth();
@@ -41,12 +42,34 @@ export async function POST(req: NextRequest) {
   const db = getDb();
   const { id, employee_id, name, config } = body;
 
-  db.prepare(`
-    INSERT INTO deployments (id, user_id, employee_id, name, status, config, deployed_at)
-    VALUES (?, ?, ?, ?, 'active', ?, datetime('now'))
-  `).run(id, user.id, employee_id, name, JSON.stringify(config));
+  // Server-side model recommendation (authoritative — not client-supplied)
+  const employee = db.prepare("SELECT * FROM ai_employees WHERE id = ?").get(employee_id) as any;
+  const capabilities = employee?.capabilities ? JSON.parse(employee.capabilities) : [];
 
-  return NextResponse.json({ success: true, id });
+  const recommendation = recommendModel({
+    agentType: employee?.agent_type || "generic",
+    toolsCount: Array.isArray(config?.tools) ? config.tools.length : 0,
+    dataSourcesCount: Array.isArray(config?.dataSources) ? config.dataSources.length : 0,
+    capabilitiesCount: capabilities.length,
+    knowledgeContentSize: employee?.agent_type === "customer-support" ? 3000 : 0,
+    schedule: config?.schedule || "24/7 Always On",
+  });
+
+  db.prepare(`
+    INSERT INTO deployments (id, user_id, employee_id, name, status, config, default_model, model_tier, deployed_at)
+    VALUES (?, ?, ?, ?, 'active', ?, ?, ?, datetime('now'))
+  `).run(id, user.id, employee_id, name, JSON.stringify(config), recommendation.modelId, recommendation.tier);
+
+  return NextResponse.json({
+    success: true,
+    id,
+    model: {
+      id: recommendation.modelId,
+      displayName: recommendation.modelDisplayName,
+      tier: recommendation.tier,
+      tierLabel: recommendation.tierLabel,
+    },
+  });
 }
 
 export async function PATCH(req: NextRequest) {

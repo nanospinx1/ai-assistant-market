@@ -29,6 +29,8 @@ import {
   Calculator,
   Users,
   Monitor,
+  Cpu,
+  Sparkles,
 } from "lucide-react";
 
 const categoryIcons: Record<string, any> = {
@@ -95,6 +97,26 @@ interface DeployConfig {
   schedule: string;
 }
 
+interface ModelRecommendation {
+  modelId: string;
+  modelDisplayName: string;
+  tier: string;
+  tierLabel: string;
+  tierDescription: string;
+  reasoning: string[];
+  estimatedCostPerMessage: number;
+  complexityScore: number;
+  alternatives: { modelId: string; modelDisplayName: string; tier: string; tradeoff: string }[];
+}
+
+const TIER_COLORS: Record<string, string> = {
+  nano: "from-emerald-500 to-teal-500",
+  mini: "from-blue-500 to-cyan-500",
+  standard: "from-violet-500 to-purple-500",
+  pro: "from-amber-500 to-orange-500",
+  premium: "from-rose-500 to-pink-500",
+};
+
 export default function DeployConfigPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -106,6 +128,9 @@ export default function DeployConfigPage() {
   const [deployed, setDeployed] = useState(false);
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [progress, setProgress] = useState(0);
+  const [recommendation, setRecommendation] = useState<ModelRecommendation | null>(null);
+  const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+  const [deployedModel, setDeployedModel] = useState<{ id: string; displayName: string; tier: string; tierLabel: string } | null>(null);
   const [config, setConfig] = useState<DeployConfig>({
     name: "",
     tools: [],
@@ -152,7 +177,7 @@ export default function DeployConfigPage() {
     }, 400);
     try {
       const deployId = crypto.randomUUID();
-      await fetch("/api/deployments", {
+      const res = await fetch("/api/deployments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -166,6 +191,10 @@ export default function DeployConfigPage() {
           },
         }),
       });
+      const data = await res.json();
+      if (data.model) {
+        setDeployedModel(data.model);
+      }
       clearInterval(interval);
       setProgress(100);
       setTimeout(() => setDeployed(true), 600);
@@ -175,6 +204,32 @@ export default function DeployConfigPage() {
       setDeploying(false);
     }
   };
+
+  // Fetch model recommendation when entering review step
+  useEffect(() => {
+    if (step === 1 && !recommendation && !loadingRecommendation) {
+      setLoadingRecommendation(true);
+      fetch("/api/deployments/recommend-model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employeeId,
+          tools: config.tools,
+          dataSources: config.dataSources,
+          schedule: config.schedule,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => setRecommendation(data.recommendation))
+        .catch(() => {})
+        .finally(() => setLoadingRecommendation(false));
+    }
+  }, [step]);
+
+  // Reset recommendation when config changes
+  useEffect(() => {
+    if (step === 0) setRecommendation(null);
+  }, [config.tools, config.dataSources, config.schedule]);
 
   // Auto-trigger deploy on step 3
   useEffect(() => {
@@ -394,6 +449,64 @@ export default function DeployConfigPage() {
                 </div>
               ))}
             </div>
+
+            {/* AI Model Recommendation */}
+            <div className="rounded-xl bg-[#0B1120] border border-[#1E293B] p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Cpu size={18} className="text-indigo-400" />
+                <h3 className="text-sm font-semibold text-[#F1F5F9]">AI Model Recommendation</h3>
+                <Sparkles size={14} className="text-amber-400" />
+              </div>
+
+              {loadingRecommendation ? (
+                <div className="flex items-center gap-2 text-sm text-[#64748B]">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-500" />
+                  Analyzing configuration...
+                </div>
+              ) : recommendation ? (
+                <div className="space-y-3">
+                  {/* Selected Model */}
+                  <div className={`flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r ${TIER_COLORS[recommendation.tier] || "from-indigo-500 to-purple-500"} bg-opacity-10 border border-[#1E293B]`}
+                    style={{ background: `linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1))` }}>
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${TIER_COLORS[recommendation.tier] || "from-indigo-500 to-purple-500"} flex items-center justify-center`}>
+                      <Cpu size={14} className="text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-[#F1F5F9]">{recommendation.modelDisplayName}</p>
+                      <p className="text-xs text-[#94A3B8]">{recommendation.tierLabel} tier — {recommendation.tierDescription}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-[#94A3B8]">~${recommendation.estimatedCostPerMessage.toFixed(4)}/msg</p>
+                      <p className="text-xs text-[#64748B]">Score: {recommendation.complexityScore.toFixed(1)}</p>
+                    </div>
+                  </div>
+
+                  {/* Reasoning */}
+                  <div className="text-xs text-[#64748B] space-y-1">
+                    {recommendation.reasoning.slice(0, 3).map((r, i) => (
+                      <p key={i}>• {r}</p>
+                    ))}
+                  </div>
+
+                  {/* Alternatives */}
+                  {recommendation.alternatives.length > 0 && (
+                    <div className="pt-2 border-t border-[#1E293B]">
+                      <p className="text-xs font-medium text-[#94A3B8] mb-2">Alternatives:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {recommendation.alternatives.map((alt) => (
+                          <div key={alt.modelId} className="p-2 rounded-lg bg-[#141B2D] border border-[#1E293B]">
+                            <p className="text-xs font-medium text-[#F1F5F9]">{alt.modelDisplayName}</p>
+                            <p className="text-xs text-[#64748B]">{alt.tradeoff}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-[#64748B]">Model recommendation will appear here.</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -411,6 +524,14 @@ export default function DeployConfigPage() {
                 <p className="text-[#94A3B8] max-w-sm mx-auto">
                   Your AI employee is now live and ready to work. Monitor performance from your dashboard.
                 </p>
+                {deployedModel && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B1120] border border-[#1E293B]">
+                    <Cpu size={14} className="text-indigo-400" />
+                    <span className="text-sm text-[#94A3B8]">Powered by</span>
+                    <span className="text-sm font-semibold text-[#F1F5F9]">{deployedModel.displayName}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300">{deployedModel.tierLabel}</span>
+                  </div>
+                )}
                 {/* Celebration dots */}
                 <div className="flex justify-center gap-2">
                   {["bg-emerald-400", "bg-indigo-400", "bg-amber-400", "bg-pink-400", "bg-cyan-400"].map((c, i) => (

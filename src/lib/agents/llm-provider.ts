@@ -114,8 +114,22 @@ export class MockLLMProvider implements LLMProvider {
 
 /**
  * Get the active LLM provider based on environment configuration.
+ * - LLM_PROVIDER=azure-openai → real Azure OpenAI calls
+ * - LLM_PROVIDER=mock (or unset in dev) → mock responses
+ * In production, fail fast if provider is not explicitly configured.
  */
 export function getLLMProvider(): LLMProvider {
-  // Future: check process.env.LLM_PROVIDER === 'openai' and return OpenAI provider
-  return new MockLLMProvider();
+  const provider = process.env.LLM_PROVIDER;
+
+  if (provider === "azure-openai") {
+    // Lazy import to avoid loading Azure provider when using mock
+    const { AzureOpenAIProvider } = require("./azure-openai-provider");
+    return new AzureOpenAIProvider();
+  }
+
+  if (provider === "mock" || !provider) {
+    return new MockLLMProvider();
+  }
+
+  throw new Error(`Unknown LLM_PROVIDER: ${provider}. Use "azure-openai" or "mock".`);
 }

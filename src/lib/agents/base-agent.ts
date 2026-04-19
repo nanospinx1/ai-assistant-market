@@ -4,6 +4,7 @@ import { AgentConfig, AgentMessage, ChatRequest, ChatResponse, TaskLog } from ".
 import { getLLMProvider } from "./llm-provider";
 import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
+import { reserveQuota, reconcileUsage, releaseReservation, QuotaExceededError } from "./usage-meter";
 
 export class BaseAgent {
   protected config: AgentConfig;
@@ -46,7 +47,7 @@ export class BaseAgent {
 
   /**
    * Process a chat request — the main entry point.
-   * Atomic: creates/finds conversation, inserts messages, logs task, all in one flow.
+   * Reserves quota → calls LLM → reconciles usage → persists results.
    */
   async chat(userId: string, request: ChatRequest): Promise<ChatResponse> {
     const db = getDb();
@@ -78,16 +79,32 @@ export class BaseAgent {
     // Build message array for LLM
     const systemPrompt = this.buildSystemPrompt();
     const history = this.loadHistory(conversationId);
-    // Remove the user message we just inserted (it's already at the end of history)
-    // Actually history includes it since we inserted before loading, so it's fine
     const messages: AgentMessage[] = [
       { role: "system", content: systemPrompt },
       ...history,
     ];
 
+    // Resolve model: deployment default → fallback
+    const model = this.resolveModel();
+
+    // Reserve quota before LLM call (estimate ~2K tokens per request)
+    const estimatedTokens = 2000;
+    let reserved = false;
     try {
-      // Generate response
-      const llmResponse = await llm.generate(messages);
+      reserveQuota(userId, estimatedTokens);
+      reserved = true;
+    } catch (err: any) {
+      if (err instanceof QuotaExceededError) {
+        db.prepare("UPDATE task_logs SET status = 'failed', output = ? WHERE id = ?")
+          .run(err.message, taskLogId);
+        throw err;
+      }
+      // Non-quota errors: proceed without reservation (metering still happens)
+    }
+
+    try {
+      // Generate response with model selection
+      const llmResponse = await llm.generate(messages, { model });
 
       // Insert assistant message
       const assistantMsgId = uuid();
@@ -114,6 +131,21 @@ export class BaseAgent {
       // Update conversation timestamp
       db.prepare("UPDATE conversations SET updated_at = datetime('now') WHERE id = ?").run(conversationId);
 
+      // Reconcile metering — log actual usage and update quota
+      reconcileUsage(userId, reserved ? estimatedTokens : 0, {
+        userId,
+        deploymentId: this.config.deploymentId,
+        conversationId,
+        taskLogId,
+        model: llmResponse.model,
+        provider: process.env.LLM_PROVIDER || "mock",
+        promptTokens: llmResponse.usage.promptTokens,
+        completionTokens: llmResponse.usage.completionTokens,
+        totalTokens: llmResponse.usage.totalTokens,
+        latencyMs: llmResponse.latencyMs,
+        status: "success",
+      });
+
       const taskLog: TaskLog = {
         id: taskLogId,
         deploymentId: this.config.deploymentId,
@@ -133,6 +165,30 @@ export class BaseAgent {
         taskLog,
       };
     } catch (error: any) {
+      // Release reservation on failure
+      if (reserved) {
+        releaseReservation(userId, estimatedTokens);
+      }
+
+      // Log error usage
+      try {
+        reconcileUsage(userId, 0, {
+          userId,
+          deploymentId: this.config.deploymentId,
+          conversationId,
+          taskLogId,
+          model: model || "unknown",
+          provider: process.env.LLM_PROVIDER || "mock",
+          promptTokens: 0,
+          completionTokens: 0,
+          totalTokens: 0,
+          status: "error",
+          errorMessage: error.message,
+        });
+      } catch {
+        // Don't let metering errors mask the original error
+      }
+
       // Update task log (failed)
       db.prepare(`
         UPDATE task_logs SET status = 'failed', output = ? WHERE id = ?
@@ -140,6 +196,19 @@ export class BaseAgent {
 
       throw error;
     }
+  }
+
+  /**
+   * Resolve which model to use for this deployment.
+   * Checks deployment record for default_model, falls back to gpt-4.1-mini.
+   */
+  private resolveModel(): string {
+    const db = getDb();
+    const deployment = db
+      .prepare("SELECT default_model FROM deployments WHERE id = ?")
+      .get(this.config.deploymentId) as any;
+
+    return deployment?.default_model || "gpt-4o-mini";
   }
 
   /**

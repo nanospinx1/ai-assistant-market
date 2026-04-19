@@ -27,6 +27,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json(response);
   } catch (err: any) {
     console.error("Chat error:", err);
+
+    // Return 429 for quota exceeded
+    if (err.name === "QuotaExceededError") {
+      return NextResponse.json({ error: err.message, code: "QUOTA_EXCEEDED" }, { status: 429 });
+    }
+
     return NextResponse.json({ error: err.message || "Chat failed" }, { status: 500 });
   }
 }
