@@ -75,10 +75,10 @@ export default function MarketplacePage() {
     <div className="animate-fade-in">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-[var(--text-primary)]">
+        <h1 className="text-2xl font-bold mb-1 text-[var(--text-primary)]">
           AI Employee Marketplace
         </h1>
-        <p className="text-[var(--text-secondary)] text-lg">
+        <p className="text-[var(--text-secondary)] text-sm">
           Find the perfect AI employee for your business
         </p>
       </div>

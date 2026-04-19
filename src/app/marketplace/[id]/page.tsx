@@ -177,12 +177,12 @@ export default function EmployeeDetailPage() {
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-[var(--text-primary)]">{employee.role}</h1>
+                  <h1 className="text-2xl font-bold text-[var(--text-primary)]">{employee.role}</h1>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${config.gradient} text-white`}>
                     {employee.category}
                   </span>
                 </div>
-                <p className="text-lg text-[var(--text-secondary)] mb-3">
+                <p className="text-base text-[var(--text-secondary)] mb-3">
                   {employee.name}
                 </p>
                 <div className="flex items-center gap-4">
@@ -332,7 +332,7 @@ export default function EmployeeDetailPage() {
             {/* Price display */}
             <div className="text-center mb-6">
               <div className="flex items-baseline justify-center gap-1">
-                <span className="text-4xl font-bold text-[var(--text-primary)]">${price}</span>
+                <span className="text-3xl font-bold text-[var(--text-primary)]">${price}</span>
                 <span className="text-[var(--text-muted)]">
                   /{plan === "yearly" ? "yr" : "mo"}
                 </span>

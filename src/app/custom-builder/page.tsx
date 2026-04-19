@@ -155,10 +155,10 @@ export default function CustomBuilderPage() {
             <Wrench size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+            <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
               Build Your Custom AI Employee
             </h1>
-            <p style={{ color: "var(--text-secondary)" }}>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Create a tailored AI employee for your specific business needs
             </p>
           </div>

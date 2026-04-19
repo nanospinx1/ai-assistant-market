@@ -152,10 +152,10 @@ export default function DeploymentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
             Your Deployments
           </h1>
-          <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
             Manage and monitor your AI employee deployments
           </p>
         </div>

@@ -227,10 +227,10 @@ export default function DashboardPage() {
     <div className="space-y-8 animate-fade-in">
       {/* ── Header ── */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
           Welcome back, {user?.name ?? "User"} 👋
         </h1>
-        <p className="mt-1 text-[var(--text-secondary)]">{today}</p>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">{today}</p>
       </div>
 
       {/* ── Stats row ── */}
@@ -247,13 +247,13 @@ export default function DashboardPage() {
               }}
             >
               <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 shadow-lg"
+                className="w-11 h-11 rounded-xl flex items-center justify-center mb-3 shadow-lg"
                 style={{ background: stat.gradient }}
               >
-                <stat.icon size={26} className="text-white" />
+                <stat.icon size={20} className="text-white" />
               </div>
-              <p className="text-3xl font-bold text-[var(--text-primary)]">{stat.value}</p>
-              <p className="text-sm mt-1 text-[var(--text-secondary)]">{stat.label}</p>
+              <p className="text-2xl font-bold text-[var(--text-primary)]">{stat.value}</p>
+              <p className="text-xs mt-1 text-[var(--text-secondary)]">{stat.label}</p>
             </div>
           );
         })}
@@ -264,7 +264,7 @@ export default function DashboardPage() {
         {/* Left: Your AI Team */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-[var(--text-primary)]">Your AI Team</h2>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Your AI Team</h2>
             <Link
               href="/deploy"
               className="text-sm font-medium flex items-center gap-1 text-[var(--primary-light)] hover:underline"
@@ -366,7 +366,7 @@ export default function DashboardPage() {
             className="rounded-2xl p-6 border border-[var(--border)]"
             style={{ background: "var(--bg-card)" }}
           >
-            <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Quick Actions</h3>
+            <h3 className="text-base font-semibold mb-4 text-[var(--text-primary)]">Quick Actions</h3>
             <div className="space-y-3">
               <Link
                 href="/marketplace"
@@ -420,7 +420,7 @@ export default function DashboardPage() {
             className="rounded-2xl p-6 border border-[var(--border)]"
             style={{ background: "var(--bg-card)" }}
           >
-            <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Recent Activity</h3>
+            <h3 className="text-base font-semibold mb-4 text-[var(--text-primary)]">Recent Activity</h3>
             <div className="space-y-4">
               {recentActivity.map((item) => (
                 <div key={item.id} className="flex items-start gap-3">

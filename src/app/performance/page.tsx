@@ -239,10 +239,10 @@ export default function PerformancePage() {
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
           Performance Analytics
         </h1>
-        <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
+        <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
           Monitor and analyze your AI team&apos;s performance in real time
         </p>
       </div>
@@ -276,7 +276,7 @@ export default function PerformancePage() {
 
       {/* Per-deployment Performance */}
       <div>
-        <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
           Performance by Employee
         </h2>
 
