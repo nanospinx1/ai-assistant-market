@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/layout/Providers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -43,7 +43,7 @@ interface EmployeeForm {
 }
 
 export default function CustomBuilderPage() {
-  const { data: session, status } = useSession();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [capInput, setCapInput] = useState("");
@@ -58,10 +58,10 @@ export default function CustomBuilderPage() {
   });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!authLoading && !user) {
       router.push("/auth/login");
     }
-  }, [status, router]);
+  }, [authLoading, user, router]);
 
   // Auto-suggest price based on capability count
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function CustomBuilderPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id,
-          userId: session?.user?.id,
+          userId: user?.id,
           ...form,
         }),
       });
@@ -112,7 +112,7 @@ export default function CustomBuilderPage() {
     form.description.trim() !== "" &&
     form.capabilities.length > 0;
 
-  if (status === "loading") {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: "var(--primary)" }} />
@@ -120,7 +120,7 @@ export default function CustomBuilderPage() {
     );
   }
 
-  if (!session) return null;
+  if (!user) return null;
 
   return (
     <div className="animate-fade-in">

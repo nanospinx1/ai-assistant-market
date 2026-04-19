@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/layout/Providers";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -26,7 +26,7 @@ interface DeployConfig {
 }
 
 export default function DeployConfigPage() {
-  const { data: session, status } = useSession();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const employeeId = params.id as string;
@@ -42,10 +42,10 @@ export default function DeployConfigPage() {
   });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!authLoading && !user) {
       router.push("/auth/login");
     }
-  }, [status, router]);
+  }, [authLoading, user, router]);
 
   const toggleItem = (list: string[], item: string) =>
     list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
@@ -63,7 +63,7 @@ export default function DeployConfigPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           employeeId,
-          userId: session?.user?.id,
+          userId: user?.id,
           ...config,
         }),
       });
@@ -75,7 +75,7 @@ export default function DeployConfigPage() {
     }
   };
 
-  if (status === "loading") {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: "var(--primary)" }} />
@@ -83,7 +83,7 @@ export default function DeployConfigPage() {
     );
   }
 
-  if (!session) return null;
+  if (!user) return null;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">

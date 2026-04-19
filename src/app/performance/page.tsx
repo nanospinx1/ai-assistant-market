@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/layout/Providers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -68,7 +68,7 @@ function LoadingSkeleton() {
 }
 
 export default function PerformancePage() {
-  const { data: session, status } = useSession();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [summary, setSummary] = useState<PerformanceSummary | null>(null);
   const [deployments, setDeployments] = useState<DeploymentPerformance[]>([]);
@@ -78,15 +78,15 @@ export default function PerformancePage() {
   const [chartLoading, setChartLoading] = useState(false);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!authLoading && !user) {
       router.push("/auth/login");
     }
-  }, [status, router]);
+  }, [authLoading, user, router]);
 
   const fetchSummary = useCallback(async () => {
-    if (!session?.user?.id) return;
+    if (!user?.id) return;
     try {
-      const res = await fetch(`/api/performance?userId=${session.user.id}`);
+      const res = await fetch(`/api/performance?userId=${user.id}`);
       if (res.ok) {
         const data = await res.json();
         setSummary(data.summary ?? data);
@@ -97,7 +97,7 @@ export default function PerformancePage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchSummary();
@@ -123,8 +123,8 @@ export default function PerformancePage() {
     }
   };
 
-  if (status === "loading" || loading) return <LoadingSkeleton />;
-  if (!session) return null;
+  if (authLoading || loading) return <LoadingSkeleton />;
+  if (!user) return null;
 
   const overviewCards = [
     {

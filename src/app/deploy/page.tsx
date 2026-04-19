@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/layout/Providers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
@@ -46,21 +46,21 @@ function LoadingSkeleton() {
 }
 
 export default function DeploymentsPage() {
-  const { data: session, status } = useSession();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!authLoading && !user) {
       router.push("/auth/login");
     }
-  }, [status, router]);
+  }, [authLoading, user, router]);
 
   const fetchDeployments = useCallback(async () => {
-    if (!session?.user?.id) return;
+    if (!user?.id) return;
     try {
-      const res = await fetch(`/api/deployments?userId=${session.user.id}`);
+      const res = await fetch(`/api/deployments?userId=${user.id}`);
       if (res.ok) {
         const data = await res.json();
         setDeployments(data.deployments ?? data);
@@ -70,7 +70,7 @@ export default function DeploymentsPage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchDeployments();
@@ -95,8 +95,8 @@ export default function DeploymentsPage() {
     }
   };
 
-  if (status === "loading" || loading) return <LoadingSkeleton />;
-  if (!session) return null;
+  if (authLoading || loading) return <LoadingSkeleton />;
+  if (!user) return null;
 
   return (
     <div className="space-y-8 animate-fade-in">
