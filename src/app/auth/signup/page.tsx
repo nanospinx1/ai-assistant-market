@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bot, Mail, Lock, User, Building2, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import { Bot, Mail, Lock, User, Building2, ArrowRight, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,141 +42,30 @@ export default function SignupPage() {
     }
   };
 
-  const inputStyles: React.CSSProperties = {
-    width: "100%",
-    padding: "0.75rem 0.75rem 0.75rem 2.5rem",
-    background: "var(--bg-dark)",
-    border: "1px solid var(--border)",
-    borderRadius: "10px",
-    color: "var(--text-primary)",
-    fontSize: "0.95rem",
-    outline: "none",
-    transition: "border-color 0.2s",
-    boxSizing: "border-box" as const,
-  };
-
-  const labelStyles: React.CSSProperties = {
-    display: "block",
-    color: "var(--text-secondary)",
-    fontSize: "0.875rem",
-    marginBottom: "0.5rem",
-    fontWeight: 500,
-  };
-
-  const iconStyles: React.CSSProperties = {
-    position: "absolute" as const,
-    left: "12px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    color: "var(--text-muted)",
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.style.borderColor = "var(--primary)";
-  };
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.style.borderColor = "var(--border)";
-  };
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--bg-dark)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-8 relative overflow-hidden">
       {/* Background gradient orbs */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-20%",
-          right: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-20%",
-          left: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
+      <div className="absolute -top-1/4 -right-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.15)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute -bottom-1/4 -left-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.1)_0%,transparent_70%)] pointer-events-none" />
 
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          animation: "fadeIn 0.5s ease-out",
-        }}
-      >
+      <div className="w-full max-w-[420px] animate-fade-in">
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "64px",
-              height: "64px",
-              borderRadius: "16px",
-              background:
-                "linear-gradient(135deg, var(--primary), var(--accent))",
-              marginBottom: "1.5rem",
-              boxShadow: "0 0 30px rgba(99,102,241,0.3)",
-            }}
-          >
-            <Bot size={32} color="white" />
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-6 shadow-xl shadow-indigo-500/30">
+            <Bot size={32} className="text-white" />
           </div>
-          <h1
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              marginBottom: "0.5rem",
-            }}
-          >
+          <p className="text-sm font-semibold text-indigo-400 tracking-wide mb-2">AI Market</p>
+          <h1 className="text-3xl font-bold text-[#F1F5F9] mb-2">
             Create Account
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+          <p className="text-[#94A3B8]">
             Join the AI Assistant Marketplace
           </p>
         </div>
 
         {/* Success toast */}
         {success && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              background: "rgba(34,197,94,0.1)",
-              border: "1px solid rgba(34,197,94,0.3)",
-              borderRadius: "10px",
-              padding: "0.75rem 1rem",
-              marginBottom: "1rem",
-              color: "#86efac",
-              fontSize: "0.9rem",
-              fontWeight: 500,
-              animation: "fadeIn 0.3s ease-out",
-            }}
-          >
+          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 mb-4 text-emerald-300 text-sm font-medium animate-fade-in">
             <CheckCircle size={18} />
             Account created! Signing you in...
           </div>
@@ -184,166 +74,115 @@ export default function SignupPage() {
         {/* Form Card */}
         <form
           onSubmit={handleSubmit}
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-            borderRadius: "16px",
-            padding: "2rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.125rem",
-          }}
+          className="bg-[#141B2D] border border-[#1E293B] rounded-2xl p-8 flex flex-col gap-5"
         >
           {error && (
-            <div
-              style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.3)",
-                borderRadius: "10px",
-                padding: "0.75rem 1rem",
-                color: "#fca5a5",
-                fontSize: "0.875rem",
-              }}
-            >
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-300 text-sm">
               {error}
             </div>
           )}
 
-          {/* Name field */}
+          {/* Name */}
           <div>
-            <label style={labelStyles}>Full Name</label>
-            <div style={{ position: "relative" }}>
-              <User size={18} style={iconStyles} />
+            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Full Name</label>
+            <div className="relative">
+              <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
                 required
-                style={inputStyles}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
           </div>
 
-          {/* Email field */}
+          {/* Email */}
           <div>
-            <label style={labelStyles}>Email Address</label>
-            <div style={{ position: "relative" }}>
-              <Mail size={18} style={iconStyles} />
+            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Email Address</label>
+            <div className="relative">
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 required
-                style={inputStyles}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
           </div>
 
-          {/* Company field */}
+          {/* Company */}
           <div>
-            <label style={labelStyles}>Company (optional)</label>
-            <div style={{ position: "relative" }}>
-              <Building2 size={18} style={iconStyles} />
+            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Company (optional)</label>
+            <div className="relative">
+              <Building2 size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="Acme Inc."
-                style={inputStyles}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
           </div>
 
-          {/* Password field */}
+          {/* Password */}
           <div>
-            <label style={labelStyles}>Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock size={18} style={iconStyles} />
+            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Password</label>
+            <div className="relative">
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 minLength={6}
-                style={inputStyles}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="w-full pl-10 pr-11 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#94A3B8] transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
-          {/* Submit button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              padding: "0.75rem",
-              background: loading
-                ? "var(--primary-dark)"
-                : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "1rem",
-              fontWeight: 600,
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1,
-              transition: "all 0.2s",
-              marginTop: "0.25rem",
-            }}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed mt-1"
           >
-            {loading ? "Creating account..." : "Create Account"}
-            {!loading && <ArrowRight size={18} />}
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                Creating account...
+              </>
+            ) : (
+              <>
+                Create Account <ArrowRight size={18} />
+              </>
+            )}
           </button>
         </form>
 
         {/* Footer links */}
-        <div
-          style={{
-            textAlign: "center",
-            marginTop: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.75rem",
-          }}
-        >
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+        <div className="text-center mt-6 flex flex-col gap-3">
+          <p className="text-[#94A3B8] text-sm">
             Already have an account?{" "}
-            <Link
-              href="/auth/login"
-              style={{
-                color: "var(--primary-light)",
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
-            >
+            <Link href="/auth/login" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">
               Sign in
             </Link>
           </p>
           <Link
             href="/"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.35rem",
-              color: "var(--text-muted)",
-              textDecoration: "none",
-              fontSize: "0.85rem",
-              justifyContent: "center",
-            }}
+            className="inline-flex items-center gap-1.5 text-[#64748B] text-sm justify-center hover:text-[#94A3B8] transition-colors"
           >
             <ArrowLeft size={14} />
             Back to Home

@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bot, Mail, Lock, ArrowRight, ArrowLeft } from "lucide-react";
+import { Bot, Mail, Lock, ArrowRight, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,87 +36,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--bg-dark)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-8 relative overflow-hidden">
       {/* Background gradient orbs */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-20%",
-          left: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-20%",
-          right: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
+      <div className="absolute -top-1/4 -left-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.15)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute -bottom-1/4 -right-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.1)_0%,transparent_70%)] pointer-events-none" />
 
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          animation: "fadeIn 0.5s ease-out",
-        }}
-      >
+      <div className="w-full max-w-[420px] animate-fade-in">
         {/* Header */}
-        <div
-          style={{
-            textAlign: "center",
-            marginBottom: "2rem",
-          }}
-        >
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "64px",
-              height: "64px",
-              borderRadius: "16px",
-              background:
-                "linear-gradient(135deg, var(--primary), var(--accent))",
-              marginBottom: "1.5rem",
-              boxShadow: "0 0 30px rgba(99,102,241,0.3)",
-            }}
-          >
-            <Bot size={32} color="white" />
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-6 shadow-xl shadow-indigo-500/30">
+            <Bot size={32} className="text-white" />
           </div>
-          <h1
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              marginBottom: "0.5rem",
-            }}
-          >
+          <p className="text-sm font-semibold text-indigo-400 tracking-wide mb-2">AI Market</p>
+          <h1 className="text-3xl font-bold text-[#F1F5F9] mb-2">
             Welcome Back
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+          <p className="text-[#94A3B8]">
             Sign in to the AI Assistant Marketplace
           </p>
         </div>
@@ -123,217 +59,93 @@ export default function LoginPage() {
         {/* Form Card */}
         <form
           onSubmit={handleSubmit}
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-            borderRadius: "16px",
-            padding: "2rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.25rem",
-          }}
+          className="bg-[#141B2D] border border-[#1E293B] rounded-2xl p-8 flex flex-col gap-5"
         >
           {error && (
-            <div
-              style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.3)",
-                borderRadius: "10px",
-                padding: "0.75rem 1rem",
-                color: "#fca5a5",
-                fontSize: "0.875rem",
-              }}
-            >
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-300 text-sm">
               {error}
             </div>
           )}
 
-          {/* Email field */}
+          {/* Email */}
           <div>
-            <label
-              style={{
-                display: "block",
-                color: "var(--text-secondary)",
-                fontSize: "0.875rem",
-                marginBottom: "0.5rem",
-                fontWeight: 500,
-              }}
-            >
+            <label className="block text-sm font-medium text-[#94A3B8] mb-2">
               Email Address
             </label>
-            <div style={{ position: "relative" }}>
-              <Mail
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "var(--text-muted)",
-                }}
-              />
+            <div className="relative">
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 2.5rem",
-                  background: "var(--bg-dark)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "10px",
-                  color: "var(--text-primary)",
-                  fontSize: "0.95rem",
-                  outline: "none",
-                  transition: "border-color 0.2s",
-                  boxSizing: "border-box",
-                }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = "var(--primary)")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = "var(--border)")
-                }
+                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
           </div>
 
-          {/* Password field */}
+          {/* Password */}
           <div>
-            <label
-              style={{
-                display: "block",
-                color: "var(--text-secondary)",
-                fontSize: "0.875rem",
-                marginBottom: "0.5rem",
-                fontWeight: 500,
-              }}
-            >
+            <label className="block text-sm font-medium text-[#94A3B8] mb-2">
               Password
             </label>
-            <div style={{ position: "relative" }}>
-              <Lock
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "var(--text-muted)",
-                }}
-              />
+            <div className="relative">
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 2.5rem",
-                  background: "var(--bg-dark)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "10px",
-                  color: "var(--text-primary)",
-                  fontSize: "0.95rem",
-                  outline: "none",
-                  transition: "border-color 0.2s",
-                  boxSizing: "border-box",
-                }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = "var(--primary)")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = "var(--border)")
-                }
+                className="w-full pl-10 pr-11 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#94A3B8] transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
-          {/* Submit button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              padding: "0.75rem",
-              background: loading
-                ? "var(--primary-dark)"
-                : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "1rem",
-              fontWeight: 600,
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1,
-              transition: "all 0.2s",
-              marginTop: "0.25rem",
-            }}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed mt-1"
           >
-            {loading ? "Signing in..." : "Sign In"}
-            {!loading && <ArrowRight size={18} />}
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                Sign In <ArrowRight size={18} />
+              </>
+            )}
           </button>
 
-          {/* Demo credentials hint */}
-          <div
-            style={{
-              background: "rgba(99,102,241,0.08)",
-              border: "1px solid rgba(99,102,241,0.2)",
-              borderRadius: "10px",
-              padding: "0.75rem 1rem",
-              fontSize: "0.825rem",
-              color: "var(--text-secondary)",
-              textAlign: "center",
-              lineHeight: 1.5,
-            }}
-          >
-            <span style={{ fontWeight: 600, color: "var(--primary-light)" }}>
-              Demo credentials:
-            </span>{" "}
+          {/* Demo credentials */}
+          <div className="bg-indigo-500/8 border border-indigo-500/20 rounded-xl px-4 py-3 text-center text-sm text-[#94A3B8]">
+            <span className="font-semibold text-indigo-300">Demo credentials:</span>{" "}
             demo@company.com / demo123
           </div>
         </form>
 
         {/* Footer links */}
-        <div
-          style={{
-            textAlign: "center",
-            marginTop: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.75rem",
-          }}
-        >
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+        <div className="text-center mt-6 flex flex-col gap-3">
+          <p className="text-[#94A3B8] text-sm">
             Don&apos;t have an account?{" "}
-            <Link
-              href="/auth/signup"
-              style={{
-                color: "var(--primary-light)",
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
-            >
+            <Link href="/auth/signup" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">
               Create one
             </Link>
           </p>
           <Link
             href="/"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.35rem",
-              color: "var(--text-muted)",
-              textDecoration: "none",
-              fontSize: "0.85rem",
-              justifyContent: "center",
-            }}
+            className="inline-flex items-center gap-1.5 text-[#64748B] text-sm justify-center hover:text-[#94A3B8] transition-colors"
           >
             <ArrowLeft size={14} />
             Back to Home

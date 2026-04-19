@@ -12,8 +12,36 @@ import {
   Zap,
   Clock,
   Users,
+  ChevronRight,
+  Headphones,
+  TrendingUp,
+  Palette,
+  Calculator,
+  BarChart3,
+  Monitor,
+  Settings,
+  Award,
+  Heart,
+  Briefcase,
 } from "lucide-react";
 import { AIEmployee } from "@/lib/types";
+
+const categoryConfig: Record<string, { icon: any; gradient: string }> = {
+  "Customer Service": { icon: Headphones, gradient: "from-blue-500 to-cyan-500" },
+  "Sales": { icon: TrendingUp, gradient: "from-emerald-500 to-teal-500" },
+  "Marketing": { icon: Palette, gradient: "from-pink-500 to-rose-500" },
+  "Finance": { icon: Calculator, gradient: "from-amber-500 to-orange-500" },
+  "Analytics": { icon: BarChart3, gradient: "from-violet-500 to-purple-500" },
+  "Human Resources": { icon: Users, gradient: "from-sky-500 to-blue-500" },
+  "IT Support": { icon: Monitor, gradient: "from-slate-400 to-zinc-500" },
+  "Operations": { icon: Settings, gradient: "from-indigo-500 to-blue-500" },
+};
+
+const defaultConfig = { icon: Briefcase, gradient: "from-gray-500 to-slate-500" };
+
+function getCategoryConfig(category: string) {
+  return categoryConfig[category] || defaultConfig;
+}
 
 const demoReviews = [
   {
@@ -78,9 +106,7 @@ export default function EmployeeDetailPage() {
         }),
       });
       if (res.ok) {
-        router.push(
-          `/deploy/${employee.id}?plan=${plan}&purchased=true`
-        );
+        router.push(`/deploy/${employee.id}?plan=${plan}&purchased=true`);
       }
     } catch {
       // handle error silently
@@ -102,8 +128,10 @@ export default function EmployeeDetailPage() {
   if (!employee) {
     return (
       <div className="text-center py-20 animate-fade-in">
-        <p className="text-5xl mb-4">😕</p>
-        <h2 className="text-2xl font-bold mb-2">Employee Not Found</h2>
+        <div className="w-16 h-16 rounded-full bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center mx-auto mb-4">
+          <Heart size={24} className="text-[var(--text-muted)]" />
+        </div>
+        <h2 className="text-2xl font-bold mb-2 text-[var(--text-primary)]">Employee Not Found</h2>
         <p className="text-[var(--text-muted)] mb-6">
           The AI employee you&apos;re looking for doesn&apos;t exist.
         </p>
@@ -118,12 +146,16 @@ export default function EmployeeDetailPage() {
     );
   }
 
+  const config = getCategoryConfig(employee.category);
+  const IconComponent = config.icon;
   const yearlySavings = employee.price_monthly * 12 - (employee.price_yearly || 0);
-  const price =
-    plan === "yearly" ? employee.price_yearly || 0 : employee.price_monthly;
+  const price = plan === "yearly" ? employee.price_yearly || 0 : employee.price_monthly;
+  const savingsPercent = employee.price_yearly
+    ? Math.round((1 - employee.price_yearly / (employee.price_monthly * 12)) * 100)
+    : 0;
 
   return (
-    <div className="animate-fade-in max-w-5xl mx-auto">
+    <div className="animate-fade-in max-w-6xl mx-auto">
       {/* Back link */}
       <Link
         href="/marketplace"
@@ -133,51 +165,70 @@ export default function EmployeeDetailPage() {
         Back to Marketplace
       </Link>
 
-      {/* Header */}
-      <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-8 mb-6">
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <span className="text-7xl">{employee.avatar}</span>
-          <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold">{employee.name}</h1>
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-[var(--primary)]/10 text-[var(--primary-light)] border border-[var(--primary)]/20">
-                {employee.category}
-              </span>
-            </div>
-            <p className="text-lg text-[var(--primary-light)] mb-3">
-              {employee.role}
-            </p>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    className={
-                      i < Math.round(employee.rating)
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-[var(--text-muted)]"
-                    }
-                  />
-                ))}
-                <span className="text-sm font-medium ml-1">
-                  {employee.rating}
-                </span>
+      {/* Hero Header */}
+      <div className={`relative rounded-2xl overflow-hidden mb-8`}>
+        <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient} opacity-15`} />
+        <div className="relative border border-[var(--border)] rounded-2xl bg-[var(--bg-card)] p-8">
+          <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
+            {/* Left side */}
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg shrink-0`}>
+                <IconComponent size={36} className="text-white" />
               </div>
-              <span className="text-sm text-[var(--text-muted)]">
-                {employee.reviews_count} reviews
-              </span>
+              <div>
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-[var(--text-primary)]">{employee.name}</h1>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${config.gradient} text-white`}>
+                    {employee.category}
+                  </span>
+                </div>
+                <p className="text-lg text-[var(--text-secondary)] mb-3">
+                  {employee.role}
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className={
+                          i < Math.round(employee.rating)
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-[var(--text-muted)]"
+                        }
+                      />
+                    ))}
+                    <span className="text-sm font-semibold text-[var(--text-primary)] ml-1">
+                      {employee.rating}
+                    </span>
+                  </div>
+                  <span className="text-sm text-[var(--text-muted)]">
+                    {employee.reviews_count} reviews
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side badges */}
+            <div className="flex flex-wrap gap-2 shrink-0">
+              {employee.rating > 4.7 && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-semibold">
+                  <Award size={14} />
+                  Most Popular
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left content */}
+        {/* Left content (2/3) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Description */}
+          {/* About */}
           <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6">
-            <h2 className="text-xl font-semibold mb-4">About</h2>
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">About</h2>
             <p className="text-[var(--text-secondary)] leading-relaxed">
               {employee.long_description || employee.description}
             </p>
@@ -185,101 +236,54 @@ export default function EmployeeDetailPage() {
 
           {/* Capabilities */}
           <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6">
-            <h2 className="text-xl font-semibold mb-4">Capabilities</h2>
-            <div className="flex flex-wrap gap-2">
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">Capabilities</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {employee.capabilities.map((cap) => (
-                <span
-                  key={cap}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-dark)] text-sm text-[var(--text-secondary)] border border-[var(--border)]"
-                >
-                  <Check size={14} className="text-[var(--success)]" />
-                  {cap}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Key Features */}
-          <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6">
-            <h2 className="text-xl font-semibold mb-4">Key Features</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                {
-                  icon: Zap,
-                  title: "Instant Setup",
-                  desc: "Deploy in under 5 minutes with guided configuration",
-                },
-                {
-                  icon: Shield,
-                  title: "Enterprise Security",
-                  desc: "SOC 2 compliant with end-to-end encryption",
-                },
-                {
-                  icon: Clock,
-                  title: "24/7 Availability",
-                  desc: "Works around the clock without breaks or downtime",
-                },
-                {
-                  icon: Users,
-                  title: "Team Integration",
-                  desc: "Seamlessly works alongside your existing team",
-                },
-              ].map((feat) => (
                 <div
-                  key={feat.title}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-[var(--bg-dark)] border border-[var(--border)]"
+                  key={cap}
+                  className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[var(--bg-dark)] text-sm text-[var(--text-secondary)] border border-[var(--border)]"
                 >
-                  <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center shrink-0">
-                    <feat.icon size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold">{feat.title}</h4>
-                    <p className="text-xs text-[var(--text-muted)]">
-                      {feat.desc}
-                    </p>
-                  </div>
+                  <Check size={15} className="text-emerald-400 shrink-0" />
+                  {cap}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Reviews */}
+          {/* What You Get */}
           <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6">
-            <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
-            <div className="space-y-4">
-              {demoReviews.map((review) => (
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">What You Get</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                {
+                  icon: Clock,
+                  title: "24/7 Operation",
+                  desc: "Works around the clock without breaks, holidays, or downtime",
+                  gradient: "from-blue-500 to-cyan-500",
+                },
+                {
+                  icon: Zap,
+                  title: "Instant Setup",
+                  desc: "Deploy in under 5 minutes with guided configuration",
+                  gradient: "from-amber-500 to-orange-500",
+                },
+                {
+                  icon: Shield,
+                  title: "Performance Dashboard",
+                  desc: "Real-time analytics and reporting on all activities",
+                  gradient: "from-emerald-500 to-teal-500",
+                },
+              ].map((feat) => (
                 <div
-                  key={review.id}
-                  className="p-4 rounded-xl bg-[var(--bg-dark)] border border-[var(--border)]"
+                  key={feat.title}
+                  className="flex flex-col items-center text-center p-5 rounded-xl bg-[var(--bg-dark)] border border-[var(--border)]"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="font-medium text-sm">
-                        {review.author}
-                      </span>
-                      <span className="text-xs text-[var(--text-muted)] ml-2">
-                        {review.company}
-                      </span>
-                    </div>
-                    <span className="text-xs text-[var(--text-muted)]">
-                      {review.date}
-                    </span>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feat.gradient} flex items-center justify-center mb-3`}>
+                    <feat.icon size={22} className="text-white" />
                   </div>
-                  <div className="flex items-center gap-0.5 mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={12}
-                        className={
-                          i < review.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-[var(--text-muted)]"
-                        }
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    {review.text}
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{feat.title}</h4>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                    {feat.desc}
                   </p>
                 </div>
               ))}
@@ -287,18 +291,18 @@ export default function EmployeeDetailPage() {
           </div>
         </div>
 
-        {/* Right sidebar — Pricing */}
-        <div className="space-y-6">
+        {/* Right sidebar — Pricing (1/3) */}
+        <div>
           <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6 sticky top-8">
-            <h2 className="text-xl font-semibold mb-4">Pricing</h2>
+            <h2 className="text-xl font-semibold mb-5 text-[var(--text-primary)]">Pricing</h2>
 
             {/* Plan toggle */}
             <div className="flex rounded-xl bg-[var(--bg-dark)] p-1 mb-6">
               <button
                 onClick={() => setPlan("monthly")}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   plan === "monthly"
-                    ? "bg-[var(--primary)] text-white"
+                    ? "bg-[var(--primary)] text-white shadow-lg shadow-indigo-500/20"
                     : "text-[var(--text-muted)] hover:text-white"
                 }`}
               >
@@ -306,9 +310,9 @@ export default function EmployeeDetailPage() {
               </button>
               <button
                 onClick={() => setPlan("yearly")}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all relative ${
                   plan === "yearly"
-                    ? "bg-[var(--primary)] text-white"
+                    ? "bg-[var(--primary)] text-white shadow-lg shadow-indigo-500/20"
                     : "text-[var(--text-muted)] hover:text-white"
                 }`}
               >
@@ -316,95 +320,95 @@ export default function EmployeeDetailPage() {
               </button>
             </div>
 
+            {/* Savings badge */}
+            {plan === "yearly" && savingsPercent > 0 && (
+              <div className="flex justify-center mb-4">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  Save {savingsPercent}%
+                </span>
+              </div>
+            )}
+
             {/* Price display */}
             <div className="text-center mb-6">
               <div className="flex items-baseline justify-center gap-1">
-                <span className="text-4xl font-bold">${price}</span>
+                <span className="text-4xl font-bold text-[var(--text-primary)]">${price}</span>
                 <span className="text-[var(--text-muted)]">
                   /{plan === "yearly" ? "yr" : "mo"}
                 </span>
               </div>
-              {plan === "yearly" && yearlySavings > 0 && (
-                <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium bg-[var(--success)]/10 text-[var(--success)] border border-[var(--success)]/20">
-                  Save ${yearlySavings}/year
-                </span>
-              )}
             </div>
+
+            {/* Feature list */}
+            <ul className="space-y-3 mb-6">
+              {[
+                "Cancel anytime",
+                "14-day free trial",
+                "Full API access included",
+                "Priority support",
+                "Custom integrations",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
+                  <Check size={15} className="text-emerald-400 shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
 
             {/* CTA */}
             <button
               onClick={handleHire}
               disabled={purchasing || !user}
-              className="w-full py-3 rounded-xl gradient-primary text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 animate-pulse-glow"
+              className={`w-full py-3.5 rounded-xl bg-gradient-to-r ${config.gradient} text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg`}
             >
               {purchasing
                 ? "Processing..."
                 : !user
                   ? "Sign in to Hire"
-                  : "Hire This Employee"}
+                  : `Hire ${employee.name}`}
             </button>
 
-            <ul className="mt-4 space-y-2 text-xs text-[var(--text-muted)]">
-              <li className="flex items-center gap-2">
-                <Check size={14} className="text-[var(--success)]" />
-                Cancel anytime
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={14} className="text-[var(--success)]" />
-                14-day free trial
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={14} className="text-[var(--success)]" />
-                Full API access included
-              </li>
-            </ul>
+            <p className="text-center text-xs text-[var(--text-muted)] mt-3">
+              30-day money-back guarantee
+            </p>
           </div>
+        </div>
+      </div>
 
-          {/* Related Employees */}
-          <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6">
-            <h3 className="text-sm font-semibold mb-3 text-[var(--text-secondary)]">
-              Related Employees
-            </h3>
-            <div className="space-y-3">
-              {[
-                {
-                  name: "Sarah",
-                  role: "Customer Support Agent",
-                  avatar: "👩‍💼",
-                  id: "emp-customer-support",
-                },
-                {
-                  name: "Marcus",
-                  role: "Sales Development Rep",
-                  avatar: "👨‍💼",
-                  id: "emp-sales-assistant",
-                },
-                {
-                  name: "Priya",
-                  role: "Data Analyst",
-                  avatar: "👩‍🔬",
-                  id: "emp-data-analyst",
-                },
-              ]
-                .filter((r) => r.id !== employee.id)
-                .slice(0, 2)
-                .map((rel) => (
-                  <Link
-                    key={rel.id}
-                    href={`/marketplace/${rel.id}`}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--bg-card-hover)] transition-colors"
-                  >
-                    <span className="text-2xl">{rel.avatar}</span>
-                    <div>
-                      <p className="text-sm font-medium">{rel.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">
-                        {rel.role}
-                      </p>
-                    </div>
-                  </Link>
+      {/* Reviews Section */}
+      <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6 mt-6">
+        <h2 className="text-xl font-semibold mb-5 text-[var(--text-primary)]">Customer Reviews</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {demoReviews.map((review) => (
+            <div
+              key={review.id}
+              className="p-5 rounded-xl bg-[var(--bg-dark)] border border-[var(--border)]"
+            >
+              <div className="flex items-center gap-0.5 mb-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={13}
+                    className={
+                      i < review.rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-[var(--text-muted)]"
+                    }
+                  />
                 ))}
+              </div>
+              <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
+                &ldquo;{review.text}&rdquo;
+              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">{review.author}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{review.company}</p>
+                </div>
+                <span className="text-xs text-[var(--text-muted)]">{review.date}</span>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
