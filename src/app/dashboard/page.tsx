@@ -64,10 +64,10 @@ interface PerformanceData {
 
 /* ── Static data ── */
 const recentActivity = [
-  { id: 1, action: "Deployed", target: "Customer Support Agent", time: "2 hours ago", icon: Rocket },
-  { id: 2, action: "Updated config for", target: "Data Analyst Pro", time: "5 hours ago", icon: Activity },
-  { id: 3, action: "Hired", target: "Content Writer AI", time: "1 day ago", icon: Plus },
-  { id: 4, action: "Performance review for", target: "Code Reviewer Bot", time: "2 days ago", icon: TrendingUp },
+  { id: 1, action: "Deployed", target: "Customer Support Agent", time: "2 hours ago", icon: Rocket, dotColor: "#10B981" },
+  { id: 2, action: "Updated config for", target: "Data Analyst Pro", time: "5 hours ago", icon: Activity, dotColor: "#3B82F6" },
+  { id: 3, action: "Hired", target: "Content Writer AI", time: "1 day ago", icon: Plus, dotColor: "#8B5CF6" },
+  { id: 4, action: "Performance review for", target: "Code Reviewer Bot", time: "2 days ago", icon: TrendingUp, dotColor: "#F59E0B" },
 ];
 
 /* ── Loading skeleton with shimmer ── */
@@ -235,30 +235,28 @@ export default function DashboardPage() {
 
       {/* ── Stats row ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="relative overflow-hidden rounded-2xl p-6 border border-[var(--border)] card-hover"
-            style={{ background: "var(--bg-card)" }}
-          >
-            {/* Large background icon */}
-            <stat.icon
-              size={80}
-              className="absolute -top-2 -right-2 opacity-[0.06]"
-              style={{ color: "var(--text-primary)" }}
-            />
-            <div className="relative z-10">
+        {stats.map((stat) => {
+          const gradientColor = stat.gradient.match(/#[A-Fa-f0-9]{6}/)?.[0] ?? "#4F46E5";
+          return (
+            <div
+              key={stat.label}
+              className="relative overflow-hidden rounded-2xl p-6 border border-[var(--border)] card-hover"
+              style={{
+                background: `linear-gradient(135deg, ${gradientColor}08 0%, var(--bg-card) 60%)`,
+                borderBottom: `3px solid ${gradientColor}40`,
+              }}
+            >
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 shadow-lg"
+                className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 shadow-lg"
                 style={{ background: stat.gradient }}
               >
-                <stat.icon size={22} className="text-white" />
+                <stat.icon size={26} className="text-white" />
               </div>
               <p className="text-3xl font-bold text-[var(--text-primary)]">{stat.value}</p>
               <p className="text-sm mt-1 text-[var(--text-secondary)]">{stat.label}</p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ── Main content: 2/3 + 1/3 ── */}
@@ -307,11 +305,15 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {deployments.map((dep) => {
                 const { icon: CategoryIcon, gradient } = getCategoryVisual(dep.employeeRole);
+                const gradientColor = gradient.match(/#[A-Fa-f0-9]{6}/)?.[0] ?? "#4F46E5";
                 return (
                   <div
                     key={dep.id}
                     className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--border)] card-hover cursor-pointer transition-all duration-200"
-                    style={{ background: "var(--bg-card)" }}
+                    style={{
+                      background: "var(--bg-card)",
+                      borderLeft: `3px solid ${gradientColor}`,
+                    }}
                   >
                     {/* Icon avatar */}
                     <div
@@ -327,6 +329,9 @@ export default function DashboardPage() {
                       <p className="text-sm truncate text-[var(--text-secondary)]">
                         {dep.employeeRole}
                       </p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                        Last active: {dep.status === "active" ? "Just now" : "2h ago"}
+                      </p>
                     </div>
                     <span
                       className={`status-${dep.status} px-3 py-1 rounded-full text-xs font-semibold`}
@@ -335,15 +340,15 @@ export default function DashboardPage() {
                     </span>
                     <div className="hidden sm:flex items-center gap-6 text-sm">
                       <div className="text-center">
-                        <p className="font-semibold text-[var(--text-primary)]">{dep.accuracy}%</p>
+                        <p className="text-base font-bold text-[var(--text-primary)]">{dep.accuracy}%</p>
                         <p className="text-xs text-[var(--text-muted)]">Accuracy</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-semibold text-[var(--text-primary)]">{dep.tasksCompleted}</p>
+                        <p className="text-base font-bold text-[var(--text-primary)]">{dep.tasksCompleted}</p>
                         <p className="text-xs text-[var(--text-muted)]">Tasks</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-semibold text-[var(--text-primary)]">{dep.uptime}</p>
+                        <p className="text-base font-bold text-[var(--text-primary)]">{dep.uptime}</p>
                         <p className="text-xs text-[var(--text-muted)]">Uptime</p>
                       </div>
                     </div>
@@ -365,7 +370,10 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <Link
                 href="/marketplace"
-                className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-[var(--bg-card-hover)] group"
+                className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group"
+                style={{ background: "transparent" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(135deg, rgba(79,70,229,0.08), rgba(129,140,248,0.04))")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
@@ -379,12 +387,15 @@ export default function DashboardPage() {
                 </div>
                 <ChevronRight
                   size={16}
-                  className="text-[var(--text-muted)] group-hover:text-[var(--primary-light)] transition-colors"
+                  className="text-[var(--text-muted)] group-hover:text-[var(--primary-light)] transition-all duration-200 group-hover:translate-x-1"
                 />
               </Link>
               <Link
                 href="/custom-builder"
-                className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-[var(--bg-card-hover)] group"
+                className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group"
+                style={{ background: "transparent" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(52,211,153,0.04))")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
@@ -398,7 +409,7 @@ export default function DashboardPage() {
                 </div>
                 <ChevronRight
                   size={16}
-                  className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors"
+                  className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-all duration-200 group-hover:translate-x-1"
                 />
               </Link>
             </div>
@@ -419,12 +430,18 @@ export default function DashboardPage() {
                   >
                     <item.icon size={14} className="text-[var(--primary-light)]" />
                   </div>
-                  <div>
-                    <p className="text-sm text-[var(--text-primary)]">
-                      {item.action}{" "}
-                      <span className="font-semibold">{item.target}</span>
-                    </p>
-                    <p className="text-xs text-[var(--text-muted)]">{item.time}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0 mt-0.5"
+                        style={{ background: item.dotColor }}
+                      />
+                      <p className="text-sm text-[var(--text-primary)]">
+                        {item.action}{" "}
+                        <span className="font-semibold">{item.target}</span>
+                      </p>
+                    </div>
+                    <p className="text-[10px] text-[var(--text-muted)] ml-4 mt-0.5">{item.time}</p>
                   </div>
                 </div>
               ))}

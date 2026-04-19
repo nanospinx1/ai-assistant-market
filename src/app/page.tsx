@@ -35,7 +35,8 @@ const featuredEmployees = [
     price: "$199",
     rating: 4.9,
     icon: Headphones,
-    gradient: "from-emerald-500 to-teal-600",
+    gradient: "from-blue-500 to-cyan-500",
+    stripGradient: "from-blue-500 to-cyan-500",
   },
   {
     name: "Alex",
@@ -44,7 +45,8 @@ const featuredEmployees = [
     price: "$299",
     rating: 4.8,
     icon: TrendingUp,
-    gradient: "from-blue-500 to-indigo-600",
+    gradient: "from-emerald-500 to-teal-500",
+    stripGradient: "from-emerald-500 to-teal-500",
   },
   {
     name: "Maya",
@@ -53,7 +55,8 @@ const featuredEmployees = [
     price: "$249",
     rating: 4.9,
     icon: Palette,
-    gradient: "from-purple-500 to-pink-600",
+    gradient: "from-pink-500 to-rose-500",
+    stripGradient: "from-pink-500 to-rose-500",
   },
   {
     name: "James",
@@ -62,7 +65,8 @@ const featuredEmployees = [
     price: "$199",
     rating: 4.7,
     icon: Calculator,
-    gradient: "from-amber-500 to-orange-600",
+    gradient: "from-amber-500 to-orange-500",
+    stripGradient: "from-amber-500 to-orange-500",
   },
 ];
 
@@ -279,72 +283,137 @@ export default function Home() {
           {/* Right: Mock dashboard card */}
           <div className="animate-fade-in hidden lg:block" style={{ animationDelay: "0.2s" }}>
             <div
-              className="rounded-2xl border p-6"
+              className="relative rounded-2xl border p-6 overflow-hidden"
               style={{
                 background: "var(--bg-card)",
                 borderColor: "var(--border)",
-                boxShadow: "0 25px 50px rgba(0,0,0,0.4)",
+                boxShadow: "0 25px 60px rgba(0,0,0,0.5), 0 0 40px rgba(79,70,229,0.08)",
               }}
             >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
-                    <Headphones className="h-5 w-5 text-white" />
+              {/* Subtle grid background */}
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(79,70,229,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(79,70,229,0.03) 1px, transparent 1px)",
+                  backgroundSize: "24px 24px",
+                }}
+              />
+
+              <div className="relative">
+                {/* Header */}
+                <div className="mb-5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20">
+                      <Headphones className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">Sarah - Support Agent</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                        Customer Support · Online
+                      </p>
+                    </div>
+                  </div>
+                  <span className="status-active rounded-full px-3 py-1 text-xs font-medium flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Active
+                  </span>
+                </div>
+
+                {/* Stats grid */}
+                <div
+                  className="mb-4 grid grid-cols-3 gap-3 rounded-xl border p-4"
+                  style={{
+                    background: "var(--bg-surface)",
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  <div>
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                      Tasks Done
+                    </p>
+                    <p className="text-xl font-bold text-white">1,247</p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--accent)" }}>↑ 12%</p>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">Sarah - Support Agent</p>
                     <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                      Customer Support
+                      Avg. Response
                     </p>
+                    <p className="text-xl font-bold" style={{ color: "var(--accent)" }}>
+                      1.2s
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--accent)" }}>↑ 8%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                      Satisfaction
+                    </p>
+                    <p className="text-xl font-bold" style={{ color: "var(--accent-warm)" }}>
+                      98%
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--accent)" }}>↑ 3%</p>
                   </div>
                 </div>
-                <span className="status-active rounded-full px-3 py-1 text-xs font-medium">
-                  Active
-                </span>
-              </div>
 
-              <div
-                className="mb-4 grid grid-cols-2 gap-3 rounded-xl border p-4"
-                style={{
-                  background: "var(--bg-surface)",
-                  borderColor: "var(--border)",
-                }}
-              >
-                <div>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    Tasks Completed
-                  </p>
-                  <p className="text-xl font-bold text-white">1,247</p>
+                {/* Mini area chart */}
+                <div className="mb-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <p
+                      className="text-xs font-medium"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Performance (7 days)
+                    </p>
+                    <p
+                      className="text-xs font-medium"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      +23% this week
+                    </p>
+                  </div>
+                  <div className="relative" style={{ height: 56 }}>
+                    {/* Area fill */}
+                    <div className="absolute inset-0 flex items-end">
+                      {[40, 55, 45, 65, 58, 72, 80, 68, 85, 78, 90, 95].map((h, i) => (
+                        <div
+                          key={i}
+                          className="flex-1"
+                          style={{
+                            height: `${h}%`,
+                            background: `linear-gradient(to top, rgba(79,70,229,0.3), rgba(16,185,129,0.05))`,
+                            borderTop: "2px solid",
+                            borderImage: "linear-gradient(to right, #4F46E5, #10B981) 1",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    Avg. Response
-                  </p>
-                  <p className="text-xl font-bold" style={{ color: "var(--accent)" }}>
-                    1.2s
-                  </p>
-                </div>
-              </div>
 
-              {/* Mini performance graph */}
-              <div>
-                <p
-                  className="mb-2 text-xs font-medium"
-                  style={{ color: "var(--text-muted)" }}
+                {/* Recent activity */}
+                <div
+                  className="rounded-lg border p-3"
+                  style={{
+                    background: "rgba(17,24,39,0.5)",
+                    borderColor: "var(--border)",
+                  }}
                 >
-                  Performance (7 days)
-                </p>
-                <div className="flex items-end gap-1.5" style={{ height: 48 }}>
-                  {[60, 75, 55, 80, 90, 70, 95].map((h, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-sm bg-gradient-to-t from-indigo-600 to-emerald-500"
-                      style={{
-                        height: `${h}%`,
-                        opacity: 0.7 + i * 0.04,
-                      }}
-                    />
-                  ))}
+                  <p className="text-xs font-medium mb-2" style={{ color: "var(--text-muted)" }}>Recent Activity</p>
+                  <div className="space-y-2">
+                    {[
+                      { text: "Resolved ticket #4821", time: "2m ago", color: "var(--accent)" },
+                      { text: "Escalated priority issue", time: "8m ago", color: "var(--accent-warm)" },
+                      { text: "Closed 3 chat sessions", time: "15m ago", color: "var(--accent)" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ background: item.color }} />
+                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{item.text}</span>
+                        </div>
+                        <span className="text-xs" style={{ color: "var(--text-muted)" }}>{item.time}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -408,35 +477,49 @@ export default function Home() {
               }}
             />
 
-            {steps.map((step) => (
-              <div
-                key={step.number}
-                className="card-hover relative flex flex-col items-center rounded-2xl p-8 text-center"
-                style={{ background: "var(--bg-card)" }}
-              >
+            {steps.map((step, idx) => {
+              const gradients = [
+                "linear-gradient(135deg, rgba(79,70,229,0.06) 0%, rgba(16,185,129,0.04) 100%)",
+                "linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(245,158,11,0.04) 100%)",
+                "linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(79,70,229,0.04) 100%)",
+              ];
+              return (
                 <div
-                  className="mb-5 flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold text-white gradient-primary"
+                  key={step.number}
+                  className="card-hover relative flex flex-col items-center rounded-2xl p-8 text-center border"
+                  style={{
+                    background: gradients[idx],
+                    borderColor: "var(--border)",
+                  }}
                 >
-                  {step.number}
+                  <div
+                    className="mb-4 flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold text-white gradient-primary"
+                    style={{
+                      boxShadow: "0 8px 24px rgba(79,70,229,0.3)",
+                    }}
+                  >
+                    {step.number}
+                  </div>
+                  <div className="mb-4 h-px w-8 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+                  <step.icon
+                    className="mb-4 h-6 w-6"
+                    style={{ color: "var(--primary-light)" }}
+                  />
+                  <h3
+                    className="mb-2 text-lg font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {step.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {step.description}
+                  </p>
                 </div>
-                <step.icon
-                  className="mb-4 h-6 w-6"
-                  style={{ color: "var(--primary-light)" }}
-                />
-                <h3
-                  className="mb-2 text-lg font-semibold"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {step.title}
-                </h3>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {step.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -476,73 +559,82 @@ export default function Home() {
             {featuredEmployees.map((emp) => (
               <div
                 key={emp.name}
-                className="card-hover group rounded-2xl p-6"
+                className="card-hover group overflow-hidden rounded-2xl"
                 style={{ background: "var(--bg-card)" }}
               >
-                <div
-                  className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${emp.gradient}`}
-                >
-                  <emp.icon className="h-7 w-7 text-white" />
-                </div>
+                {/* Gradient top strip */}
+                <div className={`h-2 w-full bg-gradient-to-r ${emp.stripGradient}`} />
 
-                <h3
-                  className="mb-0.5 font-semibold"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {emp.name}
-                </h3>
-                <p
-                  className="mb-2 text-sm"
-                  style={{ color: "var(--primary-light)" }}
-                >
-                  {emp.role}
-                </p>
-                <p
-                  className="mb-4 text-sm leading-relaxed"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {emp.description}
-                </p>
-
-                <div className="flex items-center gap-1 mb-4">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-3.5 w-3.5"
-                      style={{
-                        color:
-                          i < Math.floor(emp.rating)
-                            ? "var(--accent-warm)"
-                            : "var(--border-light)",
-                        fill:
-                          i < Math.floor(emp.rating)
-                            ? "var(--accent-warm)"
-                            : "none",
-                      }}
-                    />
-                  ))}
-                  <span
-                    className="ml-1 text-xs"
-                    style={{ color: "var(--text-muted)" }}
+                <div className="p-6">
+                  <div
+                    className={`mb-5 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br ${emp.gradient} shadow-lg`}
+                    style={{ boxShadow: "0 8px 20px rgba(0,0,0,0.2)" }}
                   >
-                    {emp.rating}
-                  </span>
-                </div>
+                    <emp.icon className="h-8 w-8 text-white" />
+                  </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-white">
-                    {emp.price}
+                  <h3
+                    className="mb-0.5 text-lg font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {emp.name}
+                  </h3>
+                  <p
+                    className="mb-2 text-sm"
+                    style={{ color: "var(--primary-light)" }}
+                  >
+                    {emp.role}
+                  </p>
+                  <p
+                    className="mb-5 text-sm leading-relaxed"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {emp.description}
+                  </p>
+
+                  <div className="flex items-center gap-1 mb-5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-3.5 w-3.5"
+                        style={{
+                          color:
+                            i < Math.floor(emp.rating)
+                              ? "var(--accent-warm)"
+                              : "var(--border-light)",
+                          fill:
+                            i < Math.floor(emp.rating)
+                              ? "var(--accent-warm)"
+                              : "none",
+                        }}
+                      />
+                    ))}
                     <span
-                      className="text-sm font-normal"
+                      className="ml-1 text-xs"
                       style={{ color: "var(--text-muted)" }}
                     >
-                      /mo
+                      {emp.rating}
                     </span>
-                  </span>
-                  <ChevronRight
-                    className="h-5 w-5 transition-transform group-hover:translate-x-1"
-                    style={{ color: "var(--text-muted)" }}
-                  />
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between border-t pt-4"
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    <span className="text-lg font-bold text-white">
+                      {emp.price}
+                      <span
+                        className="text-sm font-normal"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        /mo
+                      </span>
+                    </span>
+                    <ChevronRight
+                      className="h-5 w-5 transition-transform group-hover:translate-x-1"
+                      style={{ color: "var(--text-muted)" }}
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -572,8 +664,19 @@ export default function Home() {
             {benefits.map((b) => (
               <div
                 key={b.title}
-                className="card-hover rounded-2xl p-8"
-                style={{ background: "var(--bg-card)" }}
+                className="card-hover rounded-2xl border p-8 transition-all"
+                style={{
+                  background: "var(--bg-card)",
+                  borderColor: "var(--border)",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(79,70,229,0.3)";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 24px rgba(79,70,229,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                }}
               >
                 <div className="mb-4 flex items-center gap-4">
                   <div
@@ -583,8 +686,7 @@ export default function Home() {
                     <b.icon className="h-6 w-6" style={{ color: "var(--primary-light)" }} />
                   </div>
                   <div
-                    className="text-3xl font-extrabold"
-                    style={{ color: "var(--accent)" }}
+                    className="text-4xl font-extrabold bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent"
                   >
                     {b.stat}
                   </div>
@@ -629,15 +731,26 @@ export default function Home() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((t) => (
+            {testimonials.map((t, idx) => {
+              const borderGradients = [
+                "linear-gradient(to bottom, #4F46E5, #818CF8)",
+                "linear-gradient(to bottom, #10B981, #34D399)",
+                "linear-gradient(to bottom, #F59E0B, #FBBF24)",
+              ];
+              return (
               <div
                 key={t.name}
-                className="card-hover relative rounded-2xl p-8"
+                className="card-hover relative rounded-2xl p-8 overflow-hidden"
                 style={{ background: "var(--bg-card)" }}
               >
+                {/* Gradient left border accent */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
+                  style={{ background: borderGradients[idx] }}
+                />
                 <Quote
-                  className="absolute top-6 right-6 h-8 w-8"
-                  style={{ color: "var(--border-light)" }}
+                  className="absolute top-6 right-6 h-10 w-10 opacity-20"
+                  style={{ color: "var(--primary-light)" }}
                 />
                 <div className="mb-4 flex gap-0.5">
                   {Array.from({ length: t.rating }).map((_, i) => (
@@ -666,7 +779,8 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -681,15 +795,20 @@ export default function Home() {
             Simple Pricing
           </p>
           <h2
-            className="mb-4 text-4xl font-bold"
+            className="mb-2 text-4xl font-bold lg:text-5xl"
             style={{ color: "var(--text-primary)" }}
           >
-            Starting at{" "}
-            <span className="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-              $199/month
-            </span>{" "}
-            per AI employee
+            Starting at
           </h2>
+          <p className="mb-2 text-5xl font-extrabold lg:text-6xl bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
+            $199/month
+          </p>
+          <p
+            className="mb-2 text-xl font-medium"
+            style={{ color: "var(--text-primary)" }}
+          >
+            per AI employee
+          </p>
           <p
             className="mb-10 text-lg"
             style={{ color: "var(--text-secondary)" }}
@@ -700,10 +819,13 @@ export default function Home() {
           <div
             className="mx-auto mb-10 max-w-md rounded-2xl border p-8 text-left"
             style={{
-              background: "var(--bg-card)",
+              background: "linear-gradient(135deg, var(--bg-card) 0%, rgba(79,70,229,0.03) 100%)",
               borderColor: "var(--border)",
             }}
           >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: "var(--text-muted)" }}>
+              Everything included
+            </p>
             <ul className="space-y-4">
               {[
                 "Unlimited conversations & tasks",
@@ -714,10 +836,12 @@ export default function Home() {
                 "99.9% uptime SLA",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm">
-                  <Check
-                    className="h-5 w-5 shrink-0"
-                    style={{ color: "var(--accent)" }}
-                  />
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(16,185,129,0.1)" }}>
+                    <Check
+                      className="h-3.5 w-3.5"
+                      style={{ color: "var(--accent)" }}
+                    />
+                  </div>
                   <span style={{ color: "var(--text-secondary)" }}>{f}</span>
                 </li>
               ))}
@@ -736,8 +860,17 @@ export default function Home() {
 
       {/* ─── Final CTA ─── */}
       <section className="relative overflow-hidden py-24">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-indigo-600/5 via-transparent to-transparent" />
+        {/* Animated gradient border glow */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: "linear-gradient(135deg, rgba(79,70,229,0.06) 0%, transparent 25%, transparent 75%, rgba(16,185,129,0.06) 100%)",
+          }}
+        />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(79,70,229,0.3), rgba(16,185,129,0.3), transparent)" }} />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(16,185,129,0.3), rgba(79,70,229,0.3), transparent)" }} />
         <div className="pointer-events-none absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/10 blur-3xl animate-pulse-glow" />
+        <div className="pointer-events-none absolute top-1/3 right-1/4 h-64 w-64 rounded-full bg-emerald-600/5 blur-3xl animate-pulse" />
 
         <div className="relative mx-auto max-w-3xl px-6 text-center">
           <h2

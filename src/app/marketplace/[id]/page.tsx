@@ -293,7 +293,7 @@ export default function EmployeeDetailPage() {
 
         {/* Right sidebar — Pricing (1/3) */}
         <div>
-          <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6 sticky top-8">
+          <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] border-gradient p-6 sticky top-8">
             <h2 className="text-xl font-semibold mb-5 text-[var(--text-primary)]">Pricing</h2>
 
             {/* Plan toggle */}
@@ -359,7 +359,7 @@ export default function EmployeeDetailPage() {
             <button
               onClick={handleHire}
               disabled={purchasing || !user}
-              className={`w-full py-3.5 rounded-xl bg-gradient-to-r ${config.gradient} text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg`}
+              className={`w-full py-3.5 rounded-xl bg-gradient-to-r ${config.gradient} text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg animate-pulse-glow`}
             >
               {purchasing
                 ? "Processing..."
@@ -391,7 +391,7 @@ export default function EmployeeDetailPage() {
                     size={13}
                     className={
                       i < review.rating
-                        ? "fill-yellow-400 text-yellow-400"
+                        ? "fill-[#F59E0B] text-[#F59E0B]"
                         : "text-[var(--text-muted)]"
                     }
                   />

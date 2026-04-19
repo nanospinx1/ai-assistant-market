@@ -56,7 +56,7 @@ const categoryGradients: Record<string, string> = {
 
 interface PerformanceSummary {
   totalTasksCompleted: number;
-  avgResponseTime: string;
+  avgResponseTime: number;
   overallAccuracy: number;
   overallUptime: number;
 }
@@ -68,7 +68,7 @@ interface DeploymentPerformance {
   employeeCategory?: string;
   status: string;
   avgTasks: number;
-  avgResponseTime: string;
+  avgResponseTime: number;
   avgAccuracy: number;
   avgUptime: number;
 }
@@ -214,7 +214,7 @@ export default function PerformancePage() {
     },
     {
       label: "Avg Response Time",
-      value: summary?.avgResponseTime ?? "—",
+      value: summary?.avgResponseTime ? `${summary.avgResponseTime}s` : "—",
       icon: Clock,
       gradient: "from-emerald-500 to-teal-500",
       shadow: "shadow-emerald-500/20",

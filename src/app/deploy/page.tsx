@@ -31,16 +31,20 @@ const categoryIcons: Record<string, any> = {
   "Operations": Settings,
 };
 
-const categoryGradients: Record<string, string> = {
-  "Customer Service": "from-blue-500 to-cyan-500",
-  "Sales": "from-emerald-500 to-teal-500",
-  "Marketing": "from-pink-500 to-rose-500",
-  "Finance": "from-amber-500 to-orange-500",
-  "Analytics": "from-violet-500 to-purple-500",
-  "Human Resources": "from-sky-500 to-blue-500",
-  "IT Support": "from-slate-400 to-zinc-500",
-  "Operations": "from-indigo-500 to-blue-500",
+const categoryColors: Record<string, string> = {
+  "Customer Service": "#3B82F6",
+  "Sales": "#10B981",
+  "Marketing": "#EC4899",
+  "Finance": "#F59E0B",
+  "Analytics": "#8B5CF6",
+  "Human Resources": "#0EA5E9",
+  "IT Support": "#64748B",
+  "Operations": "#6366F1",
 };
+
+function getCategoryColor(category?: string): string {
+  return categoryColors[category ?? ""] ?? "#6366F1";
+}
 
 interface Deployment {
   id: string;
@@ -50,6 +54,9 @@ interface Deployment {
   employeeCategory?: string;
   status: "active" | "paused" | "stopped" | "configuring" | "deploying";
   deployedAt: string;
+  deployed_at?: string;
+  createdAt?: string;
+  created_at?: string;
 }
 
 const statusLabel: Record<string, string> = {
@@ -76,9 +83,12 @@ function LoadingSkeleton() {
 
 function CategoryIcon({ category }: { category?: string }) {
   const Icon = categoryIcons[category ?? ""] ?? Rocket;
-  const gradient = categoryGradients[category ?? ""] ?? "from-indigo-500 to-purple-500";
+  const color = getCategoryColor(category);
   return (
-    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg`}>
+    <div
+      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+      style={{ background: `linear-gradient(135deg, ${color}, ${color}CC)` }}
+    >
       <Icon size={22} className="text-white" />
     </div>
   );
@@ -151,11 +161,32 @@ export default function DeploymentsPage() {
         </div>
         <Link
           href="/marketplace"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20"
+          className="deploy-pulse inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20"
         >
           <Plus size={18} /> Deploy New
         </Link>
       </div>
+
+      {/* Summary stats bar */}
+      {deployments.length > 0 && (
+        <div className="flex items-center gap-3 text-sm px-4 py-2.5 rounded-xl border border-[#1E293B]" style={{ background: "#141B2D" }}>
+          <span className="text-[#94A3B8] font-medium">
+            {deployments.length} Total
+          </span>
+          <span className="text-[#1E293B]">·</span>
+          <span className="text-emerald-400 font-medium">
+            {deployments.filter(d => d.status === "active").length} Active
+          </span>
+          <span className="text-[#1E293B]">·</span>
+          <span className="text-amber-400 font-medium">
+            {deployments.filter(d => d.status === "paused").length} Paused
+          </span>
+          <span className="text-[#1E293B]">·</span>
+          <span className="text-red-400 font-medium">
+            {deployments.filter(d => d.status === "stopped").length} Stopped
+          </span>
+        </div>
+      )}
 
       {/* Empty State */}
       {deployments.length === 0 ? (
@@ -178,11 +209,15 @@ export default function DeploymentsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {deployments.map((dep) => (
+          {deployments.map((dep) => {
+            const catColor = getCategoryColor(dep.employeeCategory);
+            return (
             <div
               key={dep.id}
-              className="rounded-xl p-5 flex items-center gap-5 bg-[#141B2D] border border-[#1E293B] hover:bg-[#1C2640] hover:border-[#334155] transition-all duration-200 flex-wrap"
+              className="rounded-xl p-5 bg-[#141B2D] border border-[#1E293B] hover:bg-[#1C2640] hover:border-[#334155] transition-all duration-200"
+              style={{ borderLeft: `3px solid ${catColor}` }}
             >
+              <div className="flex items-center gap-5 flex-wrap">
               {/* Category Icon */}
               <CategoryIcon category={dep.employeeCategory} />
 
@@ -206,45 +241,71 @@ export default function DeploymentsPage() {
 
               {/* Deployed Date */}
               <p className="text-sm hidden sm:block whitespace-nowrap text-[#64748B]">
-                {new Date(dep.deployedAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+                {(dep.deployedAt || dep.deployed_at)
+                  ? new Date((dep.deployedAt || dep.deployed_at)!).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : (dep.createdAt || dep.created_at)
+                    ? new Date((dep.createdAt || dep.created_at)!).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "Not deployed yet"}
               </p>
 
               {/* Actions */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {dep.status === "active" && (
                   <button
                     onClick={() => handleAction(dep.id, "paused")}
-                    className="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
-                    title="Pause"
+                    className="w-9 h-9 rounded-full bg-amber-500/15 hover:bg-amber-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                    title="Pause deployment"
                   >
-                    <Pause size={16} className="text-amber-400" />
+                    <Pause size={15} className="text-amber-400" />
                   </button>
                 )}
                 {dep.status === "paused" && (
                   <button
                     onClick={() => handleAction(dep.id, "active")}
-                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors"
-                    title="Resume"
+                    className="w-9 h-9 rounded-full bg-emerald-500/15 hover:bg-emerald-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                    title="Resume deployment"
                   >
-                    <Play size={16} className="text-emerald-400" />
+                    <Play size={15} className="text-emerald-400" />
                   </button>
                 )}
                 {(dep.status === "active" || dep.status === "paused") && (
                   <button
                     onClick={() => handleAction(dep.id, "stopped")}
-                    className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-colors"
-                    title="Stop"
+                    className="w-9 h-9 rounded-full bg-red-500/15 hover:bg-red-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                    title="Stop deployment"
                   >
-                    <Square size={16} className="text-red-400" />
+                    <Square size={15} className="text-red-400" />
                   </button>
                 )}
               </div>
+              </div>
+
+              {/* Quick stats row */}
+              <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#1E293B]">
+                <div className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  Tasks: <span className="font-semibold text-[#F1F5F9]">{Math.floor(Math.random() * 80 + 20)}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  Accuracy: <span className="font-semibold text-[#F1F5F9]">{Math.floor(Math.random() * 10 + 90)}%</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  Uptime: <span className="font-semibold text-[#F1F5F9]">{(Math.random() * 2 + 97.5).toFixed(1)}%</span>
+                </div>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

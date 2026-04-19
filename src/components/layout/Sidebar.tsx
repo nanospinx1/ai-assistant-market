@@ -146,7 +146,7 @@ export default function Sidebar() {
                 await fetch("/api/auth/logout", { method: "POST" });
                 window.location.href = "/";
               }}
-              className="flex items-center gap-3 w-full px-4 py-2.5 mt-2 text-sm text-[var(--text-muted)] hover:text-[var(--danger)] rounded-xl transition-colors duration-200 hover:bg-red-500/5"
+              className="relative z-10 flex items-center gap-3 w-full pl-4 pr-4 py-2.5 mt-2 text-sm text-[var(--text-muted)] hover:text-[var(--danger)] rounded-xl transition-colors duration-200 hover:bg-red-500/5"
             >
               <LogOut size={18} />
               Sign Out

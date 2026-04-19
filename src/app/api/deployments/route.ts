@@ -23,6 +23,8 @@ export async function GET(req: NextRequest) {
     employeeRole: d.employee_role,
     employeeAvatar: d.employee_avatar,
     employeeCategory: d.employee_category,
+    deployedAt: d.deployed_at,
+    createdAt: d.created_at,
   }));
 
   return NextResponse.json(parsed);
