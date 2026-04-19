@@ -324,10 +324,10 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold truncate text-[var(--text-primary)]">
-                        {dep.employeeName}
+                        {dep.employeeRole}
                       </p>
                       <p className="text-sm truncate text-[var(--text-secondary)]">
-                        {dep.employeeRole}
+                        {dep.employeeName}
                       </p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">
                         Last active: {dep.status === "active" ? "Just now" : "2h ago"}

@@ -192,13 +192,13 @@ export default function MarketplacePage() {
                   </div>
                 </div>
 
-                {/* Name & Role */}
+                {/* Role & Name */}
                 <div className="px-6 flex-1">
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-0.5 group-hover:text-white transition-colors">
-                    {emp.name}
+                    {emp.role}
                   </h3>
                   <p className="text-sm text-[var(--text-secondary)] mb-2">
-                    {emp.role}
+                    {emp.name}
                   </p>
 
                   {/* Description */}

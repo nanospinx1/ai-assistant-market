@@ -177,13 +177,13 @@ export default function EmployeeDetailPage() {
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-[var(--text-primary)]">{employee.name}</h1>
+                  <h1 className="text-3xl font-bold text-[var(--text-primary)]">{employee.role}</h1>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${config.gradient} text-white`}>
                     {employee.category}
                   </span>
                 </div>
                 <p className="text-lg text-[var(--text-secondary)] mb-3">
-                  {employee.role}
+                  {employee.name}
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
