@@ -39,6 +39,7 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {
@@ -220,4 +221,75 @@ body {
   background: rgba(148, 163, 184, 0.1);
   color: var(--text-secondary);
   border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* ══════════════════════════════════════════
+   Light Mode Overrides
+   ══════════════════════════════════════════ */
+
+[data-theme="light"] {
+  --primary: #4F46E5;
+  --primary-dark: #3730A3;
+  --primary-light: #818CF8;
+  --accent: #059669;
+  --accent-warm: #D97706;
+
+  --bg-dark: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F5F9;
+  --bg-surface: #F1F5F9;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+
+  --success: #059669;
+  --warning: #D97706;
+  --danger: #DC2626;
+
+  --border: #E2E8F0;
+  --border-light: #CBD5E1;
+}
+
+/* Light scrollbar */
+[data-theme="light"] ::-webkit-scrollbar-track { background: #F1F5F9; }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: #CBD5E1; }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* Light gradient overrides */
+[data-theme="light"] .gradient-primary {
+  background: linear-gradient(135deg, #4F46E5, #10B981);
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Light status badges */
+[data-theme="light"] .status-active { background: rgba(5, 150, 105, 0.1); color: #059669; }
+[data-theme="light"] .status-paused { background: rgba(217, 119, 6, 0.1); color: #D97706; }
+[data-theme="light"] .status-stopped { background: rgba(220, 38, 38, 0.1); color: #DC2626; }
+[data-theme="light"] .status-deploying { background: rgba(79, 70, 229, 0.1); color: #4F46E5; }
+[data-theme="light"] .status-configuring { background: rgba(79, 70, 229, 0.1); color: #4F46E5; }
+
+/* Light gradient text */
+[data-theme="light"] .gradient-text {
+  background: linear-gradient(135deg, #4338CA, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Light card hover */
+[data-theme="light"] .card-hover {
+  border: 1px solid var(--border);
+}
+[data-theme="light"] .card-hover:hover {
+  border-color: #818CF8;
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);
+}
+
+/* Light stat card */
+[data-theme="light"] .stat-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }

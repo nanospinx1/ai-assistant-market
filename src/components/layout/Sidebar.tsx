@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/components/layout/Providers";
+import { useAuth, useTheme } from "@/components/layout/Providers";
 import {
   LayoutDashboard,
   Store,
@@ -14,6 +14,8 @@ import {
   Menu,
   X,
   Bot,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 const navItems = [
@@ -27,6 +29,7 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!user) return null;
@@ -141,6 +144,13 @@ export default function Sidebar() {
                 </p>
               </div>
             </div>
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-3 w-full pl-4 pr-4 py-2.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-xl transition-colors duration-200 hover:bg-[var(--bg-card-hover)]"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
+            </button>
             <button
               onClick={async () => {
                 await fetch("/api/auth/logout", { method: "POST" });

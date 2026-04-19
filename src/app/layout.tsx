@@ -19,7 +19,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geist.variable} h-full antialiased`}>
+    <html lang="en" className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              const theme = localStorage.getItem('ai-market-theme') || 'dark';
+              document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {}
+          `,
+        }} />
+      </head>
       <body className="min-h-full">
         <Providers>{children}</Providers>
       </body>

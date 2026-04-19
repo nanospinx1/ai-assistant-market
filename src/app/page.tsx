@@ -23,7 +23,10 @@ import {
   Sparkles,
   Building2,
   Globe,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "@/components/layout/Providers";
 
 /* ── Data ── */
 
@@ -155,6 +158,8 @@ const testimonials = [
 /* ── Component ── */
 
 export default function Home() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-dark)" }}>
       {/* ─── Navigation ─── */}
@@ -162,7 +167,7 @@ export default function Home() {
         className="fixed top-0 left-0 right-0 z-50 border-b"
         style={{
           borderColor: "var(--border)",
-          background: "rgba(11, 17, 32, 0.7)",
+          background: theme === "dark" ? "rgba(11, 17, 32, 0.7)" : "rgba(248, 250, 252, 0.85)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
         }}
@@ -174,7 +179,7 @@ export default function Home() {
             >
               <Bot className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">AI Market</span>
+            <span className="text-lg font-bold text-[var(--text-primary)]">AI Market</span>
           </Link>
 
           <div className="flex items-center gap-8">
@@ -184,20 +189,28 @@ export default function Home() {
             >
               <Link
                 href="/marketplace"
-                className="transition-colors hover:text-white"
+                className="transition-colors hover:text-[var(--text-primary)]"
               >
                 Marketplace
               </Link>
-              <Link href="#pricing" className="transition-colors hover:text-white">
+              <Link href="#pricing" className="transition-colors hover:text-[var(--text-primary)]">
                 Pricing
               </Link>
               <Link
                 href="/auth/login"
-                className="transition-colors hover:text-white"
+                className="transition-colors hover:text-[var(--text-primary)]"
               >
                 Sign In
               </Link>
             </div>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              style={{ color: "var(--text-secondary)" }}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <Link
               href="/auth/register"
               className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
@@ -308,7 +321,7 @@ export default function Home() {
                       <Headphones className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white">Sarah - Support Agent</p>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">Sarah - Support Agent</p>
                       <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                         Customer Support · Online
                       </p>
@@ -332,7 +345,7 @@ export default function Home() {
                     <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                       Tasks Done
                     </p>
-                    <p className="text-xl font-bold text-white">1,247</p>
+                    <p className="text-xl font-bold text-[var(--text-primary)]">1,247</p>
                     <p className="text-xs mt-0.5" style={{ color: "var(--accent)" }}>↑ 12%</p>
                   </div>
                   <div>
@@ -547,7 +560,7 @@ export default function Home() {
             </div>
             <Link
               href="/marketplace"
-              className="hidden items-center gap-1.5 text-sm font-semibold transition-colors hover:text-white md:flex"
+              className="hidden items-center gap-1.5 text-sm font-semibold transition-colors hover:text-[var(--text-primary)] md:flex"
               style={{ color: "var(--primary-light)" }}
             >
               View All
@@ -621,7 +634,7 @@ export default function Home() {
                     className="flex items-center justify-between border-t pt-4"
                     style={{ borderColor: "var(--border)" }}
                   >
-                    <span className="text-lg font-bold text-white">
+                    <span className="text-lg font-bold text-[var(--text-primary)]">
                       {emp.price}
                       <span
                         className="text-sm font-normal"
@@ -924,7 +937,7 @@ export default function Home() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
-                <span className="font-bold text-white">AI Market</span>
+                <span className="font-bold text-[var(--text-primary)]">AI Market</span>
               </div>
               <p
                 className="text-sm leading-relaxed"
@@ -982,7 +995,7 @@ export default function Home() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-sm transition-colors hover:text-white"
+                        className="text-sm transition-colors hover:text-[var(--text-primary)]"
                         style={{ color: "var(--text-muted)" }}
                       >
                         {link.label}

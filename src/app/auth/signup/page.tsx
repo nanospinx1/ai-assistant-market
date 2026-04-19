@@ -43,7 +43,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-8 relative overflow-hidden" style={{ background: "var(--bg-primary)" }}>
       {/* Background gradient orbs */}
       <div className="absolute -top-1/4 -right-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.15)_0%,transparent_70%)] pointer-events-none" />
       <div className="absolute -bottom-1/4 -left-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.1)_0%,transparent_70%)] pointer-events-none" />
@@ -55,17 +55,17 @@ export default function SignupPage() {
             <Bot size={32} className="text-white" />
           </div>
           <p className="text-sm font-semibold text-indigo-400 tracking-wide mb-2">AI Market</p>
-          <h1 className="text-3xl font-bold text-[#F1F5F9] mb-2">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
             Create Account
           </h1>
-          <p className="text-[#94A3B8]">
+          <p style={{ color: "var(--text-secondary)" }}>
             Join the AI Assistant Marketplace
           </p>
         </div>
 
         {/* Success toast */}
         {success && (
-          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 mb-4 text-emerald-300 text-sm font-medium animate-fade-in">
+          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 mb-4 text-emerald-500 text-sm font-medium animate-fade-in">
             <CheckCircle size={18} />
             Account created! Signing you in...
           </div>
@@ -74,66 +74,70 @@ export default function SignupPage() {
         {/* Form Card */}
         <form
           onSubmit={handleSubmit}
-          className="bg-[#141B2D] border border-[#1E293B] rounded-2xl p-8 flex flex-col gap-5"
+          className="rounded-2xl p-8 flex flex-col gap-5"
+          style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}
         >
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-300 text-sm">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-500 text-sm">
               {error}
             </div>
           )}
 
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Full Name</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Full Name</label>
             <div className="relative">
-              <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
+              <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
                 required
-                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
             </div>
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Email Address</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Email Address</label>
             <div className="relative">
-              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 required
-                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
             </div>
           </div>
 
           {/* Company */}
           <div>
-            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Company (optional)</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Company (optional)</label>
             <div className="relative">
-              <Building2 size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
+              <Building2 size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="Acme Inc."
-                className="w-full pl-10 pr-4 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-[#94A3B8] mb-2">Password</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Password</label>
             <div className="relative">
-              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
@@ -141,12 +145,14 @@ export default function SignupPage() {
                 placeholder="••••••••"
                 required
                 minLength={6}
-                className="w-full pl-10 pr-11 py-3 bg-[#0B1120] border border-[#1E293B] rounded-xl text-[#F1F5F9] placeholder-[#64748B] outline-none focus:border-indigo-500 transition-colors"
+                className="w-full pl-10 pr-11 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#94A3B8] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color: "var(--text-muted)" }}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -174,7 +180,7 @@ export default function SignupPage() {
 
         {/* Footer links */}
         <div className="text-center mt-6 flex flex-col gap-3">
-          <p className="text-[#94A3B8] text-sm">
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
             Already have an account?{" "}
             <Link href="/auth/login" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">
               Sign in
@@ -182,7 +188,8 @@ export default function SignupPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[#64748B] text-sm justify-center hover:text-[#94A3B8] transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm justify-center transition-colors"
+            style={{ color: "var(--text-muted)" }}
           >
             <ArrowLeft size={14} />
             Back to Home
