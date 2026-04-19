@@ -159,7 +159,7 @@ export default function EmployeeDetailPage() {
       {/* Back link */}
       <Link
         href="/marketplace"
-        className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-white mb-6 transition-colors text-sm"
+        className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary)] mb-6 transition-colors text-sm"
       >
         <ArrowLeft size={16} />
         Back to Marketplace
