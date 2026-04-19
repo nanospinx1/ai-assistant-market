@@ -28,7 +28,11 @@
 
   /* Borders */
   --border: #1E293B;
+  --border-primary: #1E293B;
   --border-light: #2D3748;
+
+  /* Alias for bg-primary */
+  --bg-primary: #0B1120;
 }
 
 /* ── Base ── */
@@ -40,6 +44,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Select dropdown options */
+select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 * {
@@ -248,7 +258,10 @@ body {
   --danger: #DC2626;
 
   --border: #E2E8F0;
+  --border-primary: #E2E8F0;
   --border-light: #CBD5E1;
+
+  --bg-primary: #F8FAFC;
 }
 
 /* Light scrollbar */
