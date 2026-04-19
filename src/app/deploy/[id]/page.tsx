@@ -147,12 +147,27 @@ export default function DeployConfigPage() {
   useEffect(() => {
     async function loadEmployee() {
       try {
-        const res = await fetch("/api/employees");
+        // Fetch specific employee by ID (supports custom agents too)
+        const res = await fetch(`/api/employees?id=${employeeId}`);
         if (res.ok) {
           const data = await res.json();
-          const list = data.employees ?? data;
-          const found = list.find((e: Employee) => e.id === employeeId);
-          if (found) setEmployee(found);
+          // If response has an 'id' field directly, it's a single employee
+          if (data.id) {
+            setEmployee(data);
+            // Pre-populate tools from custom agent defaults
+            if (data.default_tools && Array.isArray(data.default_tools) && data.default_tools.length > 0) {
+              const toolNameMap: Record<string, string> = { email: "Email", crm: "CRM", calendar: "Calendar" };
+              const mappedTools = data.default_tools
+                .map((t: string) => toolNameMap[t] || t)
+                .filter((t: string) => TOOLS.some((tool) => tool.name === t));
+              setConfig((c) => ({ ...c, tools: mappedTools.length > 0 ? mappedTools : c.tools }));
+            }
+          } else {
+            // Fallback: list response
+            const list = data.employees ?? data;
+            const found = (list as Employee[]).find((e) => e.id === employeeId);
+            if (found) setEmployee(found);
+          }
         }
       } catch {
         // silently handle

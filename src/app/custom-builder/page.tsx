@@ -148,7 +148,7 @@ export default function CustomBuilderPage() {
         }),
       });
       if (res.ok) {
-        router.push(`/marketplace/${id}`);
+        router.push(`/deploy/${id}`);
       }
     } catch {
       // handle error
