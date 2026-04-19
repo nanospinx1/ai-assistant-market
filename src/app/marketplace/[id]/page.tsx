@@ -82,6 +82,12 @@ export default function EmployeeDetailPage() {
   const [purchasing, setPurchasing] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishStatus, setPublishStatus] = useState<"idle" | "submitted" | "already" | "error">("idle");
+  const [portfolio, setPortfolio] = useState<{
+    specialty?: string;
+    toolIntegrations?: { name: string; note: string }[];
+    bestFor?: string[];
+    useCases?: { title: string; description: string; outcome: string }[];
+  } | null>(null);
 
   const id = params.id as string;
 
@@ -94,6 +100,34 @@ export default function EmployeeDetailPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  }, [id]);
+
+  // Fetch portfolio data from marketplace submission snapshot
+  useEffect(() => {
+    fetch(`/api/marketplace/submit?employeeId=${id}`)
+      .then((r) => {
+        if (!r.ok) return null;
+        return r.json();
+      })
+      .then((data) => {
+        if (!Array.isArray(data) || data.length === 0) return;
+        const sub = data.find(
+          (s: { employee_id?: string; status?: string }) =>
+            s.employee_id === id && s.status === "approved"
+        );
+        if (sub?.snapshot) {
+          const snap = typeof sub.snapshot === "string" ? JSON.parse(sub.snapshot) : sub.snapshot;
+          if (snap.specialty || snap.toolIntegrations || snap.bestFor || snap.useCases) {
+            setPortfolio({
+              specialty: snap.specialty,
+              toolIntegrations: snap.toolIntegrations,
+              bestFor: snap.bestFor,
+              useCases: snap.useCases,
+            });
+          }
+        }
+      })
+      .catch(() => {});
   }, [id]);
 
   const handleHire = async () => {
@@ -458,6 +492,91 @@ export default function EmployeeDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Community Agent Portfolio Section */}
+      {portfolio && (
+        <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6 mt-6">
+          <div className="flex items-center gap-2 mb-5">
+            <Globe size={20} className="text-cyan-400" />
+            <h2 className="text-xl font-semibold text-[var(--text-primary)]">Community Agent</h2>
+          </div>
+
+          {/* Specialty */}
+          {portfolio.specialty && (
+            <div className="mb-5">
+              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2 text-[var(--text-muted)]">
+                Specialty
+              </h3>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                {portfolio.specialty}
+              </p>
+            </div>
+          )}
+
+          {/* Tool Integrations */}
+          {portfolio.toolIntegrations && portfolio.toolIntegrations.length > 0 && (
+            <div className="mb-5">
+              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2 text-[var(--text-muted)]">
+                Tool Integrations
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {portfolio.toolIntegrations.map((tool, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/15 text-cyan-400 border border-cyan-500/20"
+                    title={tool.note || undefined}
+                  >
+                    {tool.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Best For */}
+          {portfolio.bestFor && portfolio.bestFor.length > 0 && (
+            <div className="mb-5">
+              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2 text-[var(--text-muted)]">
+                Best For
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {portfolio.bestFor.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/15 text-purple-300 border border-purple-500/20"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Use Cases */}
+          {portfolio.useCases && portfolio.useCases.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
+                Use Cases
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {portfolio.useCases.map((uc, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-xl bg-[var(--bg-dark)] border border-[var(--border)]"
+                  >
+                    <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{uc.title}</h4>
+                    <p className="text-xs text-[var(--text-secondary)] mb-2 leading-relaxed">{uc.description}</p>
+                    <div className="flex items-center gap-1.5">
+                      <Check size={12} className="text-emerald-400 shrink-0" />
+                      <span className="text-xs font-medium text-emerald-400">{uc.outcome}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Reviews Section */}
       <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] p-6 mt-6">

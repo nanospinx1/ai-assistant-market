@@ -11,6 +11,7 @@ import {
   Square,
   Plus,
   MessageSquare,
+  GraduationCap,
   Headphones,
   TrendingUp,
   Palette,
@@ -19,6 +20,9 @@ import {
   Users,
   Monitor,
   Settings,
+  Lock,
+  Globe,
+  Upload,
 } from "lucide-react";
 
 const categoryIcons: Record<string, any> = {
@@ -50,9 +54,13 @@ function getCategoryColor(category?: string): string {
 interface Deployment {
   id: string;
   name: string;
+  employee_id: string;
   employeeName: string;
   employeeRole?: string;
   employeeCategory?: string;
+  agentType?: string;
+  isPublished?: boolean;
+  publishStatus?: string;
   status: "active" | "paused" | "stopped" | "configuring" | "deploying";
   deployedAt: string;
   deployed_at?: string;
@@ -224,13 +232,27 @@ export default function DeploymentsPage() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
-                  {dep.name}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
+                    {dep.name}
+                  </p>
+                  {/* Privacy badge */}
+                  {dep.agentType === "custom" && (
+                    dep.isPublished ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                        <Globe size={10} /> Published
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-500/15 text-slate-400 border border-slate-500/20">
+                        <Lock size={10} /> Private
+                      </span>
+                    )
+                  )}
+                </div>
                 <p className="text-sm truncate" style={{ color: "var(--text-secondary)" }}>
-                  {dep.employeeName}
-                  {dep.employeeRole && (
-                    <span style={{ color: "var(--text-muted)" }}> &middot; {dep.employeeRole}</span>
+                  {dep.employeeRole || dep.employeeName}
+                  {dep.employeeCategory && (
+                    <span style={{ color: "var(--text-muted)" }}> · {dep.employeeCategory}</span>
                   )}
                 </p>
               </div>
@@ -259,6 +281,23 @@ export default function DeploymentsPage() {
 
               {/* Actions */}
               <div className="flex items-center gap-2">
+                {/* Publish to Marketplace — only for custom, unpublished agents */}
+                {dep.agentType === "custom" && !dep.isPublished && (
+                  <button
+                    onClick={() => router.push(`/deploy/publish/${dep.employee_id}?deploymentId=${dep.id}`)}
+                    className="w-9 h-9 rounded-full bg-cyan-500/15 hover:bg-cyan-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                    title="Publish to Marketplace"
+                  >
+                    <Upload size={15} className="text-cyan-400" />
+                  </button>
+                )}
+                <button
+                  onClick={() => router.push(`/deploy/${dep.id}/onboarding`)}
+                  className="w-9 h-9 rounded-full bg-purple-500/15 hover:bg-purple-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                  title="Onboard agent"
+                >
+                  <GraduationCap size={15} className="text-purple-400" />
+                </button>
                 {dep.status === "active" && (
                   <button
                     onClick={() => router.push(`/deploy/${dep.id}/chat`)}

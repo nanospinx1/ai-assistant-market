@@ -88,6 +88,7 @@ interface Employee {
   name: string;
   category?: string;
   role?: string;
+  agent_type?: string;
 }
 
 interface DeployConfig {
@@ -131,6 +132,7 @@ export default function DeployConfigPage() {
   const [recommendation, setRecommendation] = useState<ModelRecommendation | null>(null);
   const [loadingRecommendation, setLoadingRecommendation] = useState(false);
   const [deployedModel, setDeployedModel] = useState<{ id: string; displayName: string; tier: string; tierLabel: string } | null>(null);
+  const [deployedDeploymentId, setDeployedDeploymentId] = useState<string | null>(null);
   const [config, setConfig] = useState<DeployConfig>({
     name: "",
     tools: [],
@@ -154,6 +156,10 @@ export default function DeployConfigPage() {
           // If response has an 'id' field directly, it's a single employee
           if (data.id) {
             setEmployee(data);
+            // Pre-populate name from employee for custom agents
+            if (data.agent_type === "custom" && data.name) {
+              setConfig((c) => ({ ...c, name: c.name || data.name }));
+            }
             // Pre-populate tools from custom agent defaults
             if (data.default_tools && Array.isArray(data.default_tools) && data.default_tools.length > 0) {
               const toolNameMap: Record<string, string> = { email: "Email", crm: "CRM", calendar: "Calendar" };
@@ -210,6 +216,7 @@ export default function DeployConfigPage() {
       if (data.model) {
         setDeployedModel(data.model);
       }
+      setDeployedDeploymentId(deployId);
       clearInterval(interval);
       setProgress(100);
       setTimeout(() => setDeployed(true), 600);
@@ -326,18 +333,23 @@ export default function DeployConfigPage() {
               </div>
             </div>
 
-            {/* Deployment Name */}
+            {/* Employee Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-[#94A3B8]">
-                Deployment Name
+                Name Your Employee
               </label>
               <input
                 type="text"
                 value={config.name}
                 onChange={(e) => setConfig((c) => ({ ...c, name: e.target.value }))}
-                placeholder="e.g. Customer Support – West Region"
+                placeholder="e.g. Sarah, Alex, Max"
                 className="w-full px-4 py-3 rounded-xl outline-none transition-colors bg-[#0B1120] border border-[#1E293B] text-[#F1F5F9] placeholder-[#64748B] focus:border-indigo-500"
               />
+              {employee && (
+                <p className="text-xs text-[#64748B]">
+                  Job title: <span className="text-[#94A3B8]">{employee.role || employee.name}</span>
+                </p>
+              )}
             </div>
 
             {/* Tools */}
@@ -448,11 +460,11 @@ export default function DeployConfigPage() {
 
             <div className="rounded-xl bg-[#0B1120] border border-[#1E293B] divide-y divide-[#1E293B]">
               {[
-                { label: "Deployment Name", value: config.name },
+                { label: "Employee Name", value: config.name },
+                { label: "Job Title", value: employee?.role || employee?.name || employeeId },
                 { label: "Tools", value: config.tools.join(", ") },
                 { label: "Data Sources", value: config.dataSources.join(", ") },
                 { label: "Schedule", value: config.schedule },
-                { label: "Employee", value: employee?.name ?? employeeId },
               ].map((row) => (
                 <div key={row.label} className="flex justify-between items-start p-4">
                   <span className="text-sm font-medium text-[#94A3B8]">
@@ -558,10 +570,17 @@ export default function DeployConfigPage() {
                   ))}
                 </div>
                 <button
-                  onClick={() => router.push("/dashboard")}
+                  onClick={() => router.push(`/deploy/${deployedDeploymentId || employeeId}/onboarding`)}
                   className="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20"
                 >
-                  Go to Dashboard
+                  Start Onboarding <ArrowRight size={16} />
+                </button>
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="text-sm transition-colors hover:underline"
+                  style={{ color: "#94A3B8" }}
+                >
+                  Skip to Dashboard
                 </button>
               </>
             ) : (

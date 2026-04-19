@@ -14,7 +14,9 @@ export async function GET() {
   const userId = user.id;
 
   const deployments = db.prepare(`
-    SELECT d.*, e.name as employee_name, e.role as employee_role, e.avatar as employee_avatar, e.category as employee_category
+    SELECT d.*, e.name as employee_name, e.role as employee_role, e.avatar as employee_avatar,
+           e.category as employee_category, e.agent_type as agent_type,
+           e.is_published as is_published, e.publish_status as publish_status
     FROM deployments d
     JOIN ai_employees e ON d.employee_id = e.id
     WHERE d.user_id = ?
@@ -28,6 +30,9 @@ export async function GET() {
     employeeRole: d.employee_role,
     employeeAvatar: d.employee_avatar,
     employeeCategory: d.employee_category,
+    agentType: d.agent_type,
+    isPublished: !!d.is_published,
+    publishStatus: d.publish_status,
     deployedAt: d.deployed_at,
     createdAt: d.created_at,
   }));

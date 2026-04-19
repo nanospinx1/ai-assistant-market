@@ -31,15 +31,14 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // List: show prebuilt + approved community agents + user's own custom agents
-  const { user } = await requireAuth().catch(() => ({ user: null }));
+  // List: marketplace shows ONLY public agents (prebuilt + approved community)
+  // User's private custom agents are only visible via ?id= param or in Deployments
   const employees = db.prepare(`
     SELECT * FROM ai_employees
     WHERE is_prebuilt = 1
        OR (is_prebuilt = 0 AND publish_status = 'approved')
-       OR (is_prebuilt = 0 AND created_by = ?)
     ORDER BY rating DESC
-  `).all(user?.id ?? "");
+  `).all();
   const parsed = employees.map((e: any) => ({
     ...e,
     capabilities: JSON.parse(e.capabilities || "[]"),
