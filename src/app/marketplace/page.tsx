@@ -179,16 +179,16 @@ export default function MarketplacePage() {
                 style={{ animationDelay: `${idx * 0.05}s` }}
               >
                 {/* Gradient Strip + Category Badge */}
-                <div className={`relative h-20 bg-gradient-to-r ${config.gradient} opacity-80`}>
+                <div className={`relative h-14 bg-gradient-to-r ${config.gradient} opacity-80`}>
                   <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/30 text-white backdrop-blur-sm">
                     {emp.category}
                   </span>
                 </div>
 
                 {/* Avatar Icon */}
-                <div className="px-6 -mt-8 mb-3 relative z-10">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg border-4 border-[var(--bg-card)]`}>
-                    <IconComponent size={28} className="text-white" />
+                <div className="px-6 -mt-7 mb-3 relative z-10">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg border-2 border-[var(--bg-card)]`}>
+                    <IconComponent size={24} className="text-white" />
                   </div>
                 </div>
 
