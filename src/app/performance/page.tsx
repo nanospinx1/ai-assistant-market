@@ -159,8 +159,16 @@ export default function PerformancePage() {
       const res = await fetch(`/api/performance?userId=${user.id}`);
       if (res.ok) {
         const data = await res.json();
-        setSummary(data.summary ?? data);
-        setDeployments(data.deployments ?? []);
+        // API returns flat array of deployment performance objects
+        const deps: DeploymentPerformance[] = Array.isArray(data) ? data : (data.deployments ?? []);
+        setDeployments(deps);
+        if (deps.length > 0) {
+          const totalTasks = deps.reduce((s, d) => s + (d.avgTasks || 0), 0);
+          const avgResponse = deps.reduce((s, d) => s + (d.avgResponseTime || 0), 0) / deps.length;
+          const avgAccuracy = deps.reduce((s, d) => s + (d.avgAccuracy || 0), 0) / deps.length;
+          const avgUptime = deps.reduce((s, d) => s + (d.avgUptime || 0), 0) / deps.length;
+          setSummary({ totalTasksCompleted: Math.round(totalTasks), avgResponseTime: +avgResponse.toFixed(1), overallAccuracy: +avgAccuracy.toFixed(1), overallUptime: +avgUptime.toFixed(1) });
+        }
       }
     } catch {
       // silently handle
