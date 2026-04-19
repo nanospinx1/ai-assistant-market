@@ -187,7 +187,7 @@ export default function MarketplacePage() {
 
                 {/* Avatar Icon */}
                 <div className="px-6 -mt-7 mb-3 relative z-10">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg border-2 border-[var(--bg-card)]`}>
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg border border-[var(--bg-card)]`}>
                     <IconComponent size={24} className="text-white" />
                   </div>
                 </div>
