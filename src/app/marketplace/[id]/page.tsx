@@ -110,9 +110,21 @@ export default function EmployeeDetailPage() {
       });
       if (res.ok) {
         router.push(`/deploy/${employee.id}`);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          // Session expired — redirect to login
+          alert("Session expired. Please log in again.");
+          router.push("/login");
+        } else {
+          // Purchase failed but still allow deploy flow
+          console.warn("Purchase recording failed, proceeding to deploy:", data.error);
+          router.push(`/deploy/${employee.id}`);
+        }
       }
     } catch {
-      // handle error silently
+      // Network error — still allow deploy flow
+      router.push(`/deploy/${employee.id}`);
     } finally {
       setPurchasing(false);
     }
