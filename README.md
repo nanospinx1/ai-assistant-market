@@ -1,6 +1,6 @@
 # 🤖 AI Assistant Market
 
-A full-stack marketplace where small businesses can **hire, deploy, and manage AI employees** — without worrying about technical details. Browse pre-built AI agents for common tasks or create custom agents tailored to your workflows.
+A full-stack marketplace where small businesses can **hire, deploy, and manage AI employees** — without worrying about technical details. Browse pre-built AI agents, create custom agents tailored to your workflows, publish them to the community marketplace, and connect real tools like email, CRM, and calendar.
 
 > **Status:** In active development · Local testing stage · Not yet deployed to production
 
@@ -14,21 +14,59 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 ## ✨ Features
 
 ### 🏪 Marketplace
-- Browse a curated catalog of pre-built AI employees (Customer Support, Data Analyst, Bookkeeper, IT Helpdesk, and more)
-- Category-based filtering and search
+- Browse **10 pre-built AI employees** across 8 categories (Customer Support, Sales Rep, Bookkeeper, Data Analyst, Content Writer, Social Media Manager, HR Assistant, IT Helpdesk, Project Manager, Virtual Receptionist)
+- Category-based filtering and search (including a "Community" tab for user-published agents)
 - Detailed employee profiles with capabilities, pricing, and ratings
+- Community agents display a green "Community" badge
 - Light & dark mode with seamless theme switching
+
+### 🧠 Data-Driven Agent Prompt System
+- Each of the 10 agent types has a unique, professionally crafted system prompt defined in `agent-prompts.ts`
+- Prompts include: base personality, default knowledge, tool-specific instructions, and data source instructions
+- Customer configuration (tools, data sources, schedules, custom instructions) is dynamically injected into the prompt at runtime via `buildFullSystemPrompt()`
+- Canonical agent type IDs used consistently across the entire codebase
 
 ### 🚀 3-Stage Deployment Flow
 1. **Select & Configure** — Choose tools, data sources, knowledge base, and schedule
 2. **Review & Recommend** — AI-powered model recommendation engine analyzes task complexity and suggests the optimal model
 3. **Deploy** — One-click deployment with real-time status tracking
+- Knowledge is seeded at deployment creation time (not just activation)
+- Agent snapshot frozen at deploy time so later edits don't affect running deployments
 
-### 💬 Real-Time AI Chat
+### 💬 Real-Time AI Chat with Function Calling
 - Multi-turn conversations with deployed AI agents
+- **Function calling support** — agents can invoke tools (email, CRM, calendar) during conversations
+- Up to 5 tool-calling rounds per message (LLM calls tool → executes → feeds result back → LLM continues)
 - Context preserved across messages
 - Knowledge base injection (agents reference your configured data)
-- Per-message response metrics (tokens, latency, model used)
+- Per-message response metrics (tokens, latency, model used, tool rounds)
+
+### 🔧 Custom Agent Builder
+- **System prompt editor** — define the core behavior and personality (advanced, optional)
+- **Custom instructions** — add rules, tone guidelines, or constraints
+- **Default tools picker** — select which tools (Email, CRM, Calendar) the agent can use
+- **Knowledge base editor** — add/remove reference documents, FAQs, or policies with title + content
+- **Capabilities & pricing** — define skills and auto-calculated pricing
+- **Live marketplace preview** — see how your agent will appear in the catalog as you build
+- All settings stored in DB and used during deployment
+
+### 🌐 Community Marketplace
+- **Publish custom agents** for other users to discover and deploy
+- Auto-approve flow for MVP (instant publishing)
+- Community agents appear in the marketplace with a green "Community" badge
+- Dedicated "Community" category filter tab
+- Snapshot-based publishing — your agent definition is frozen at publish time
+- Install tracking per community agent
+
+### 🔌 Tool Integrations
+- **Email Tool** — Send emails, draft messages, manage templates (SendGrid API, webhook, or simulation mode)
+- **CRM Tool** — Search contacts, log interactions, create/update records (webhook or built-in simulation)
+- **Calendar Tool** — Schedule meetings, check availability, list upcoming events (webhook or built-in simulation)
+- **Integrations page** — Add, view, and remove tool connections from the sidebar
+- Each tool supports 3 modes: real API (e.g., SendGrid), webhook (forward to your backend), or built-in simulation
+- **Tool Executor** — Central dispatcher routes LLM function calls to the correct tool handler
+- **Deployment tool bindings** — Link tool connections to specific deployments
+- **Execution logging** — Every tool call is logged with input, output, status, and duration
 
 ### 🧠 Smart Model Recommendation Engine
 - Complexity scoring algorithm evaluates: agent type, tools, data sources, knowledge base size, schedule
@@ -46,7 +84,7 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 
 ### 📈 Dashboard & Performance Tracking
 - Overview dashboard with total deployments, active agents, tasks completed, response times
-- Individual deployment performance metrics
+- Individual deployment performance metrics with agent-specific names
 - Task logs with status, duration, and token usage
 
 ### 🔐 Authentication
@@ -60,6 +98,7 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 - Animated cards, gradients, and hover effects
 - Category-specific color schemes and avatars
 - Consistent styling across all pages
+- Sidebar navigation: Dashboard, Marketplace, Deployments, Performance, Custom Builder, Integrations
 
 ---
 
@@ -73,6 +112,7 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 | Database      | SQLite via better-sqlite3           |
 | Auth          | Custom JWT (jose + bcrypt)          |
 | LLM Provider  | Azure OpenAI (REST API, no SDK)     |
+| Tool Framework| Custom (Email/CRM/Calendar handlers)|
 | State Mgmt    | React Context + Server Components   |
 
 ---
@@ -86,30 +126,45 @@ ai-assistant-market/
 │   │   ├── api/
 │   │   │   ├── auth/           # Login, signup, logout, session endpoints
 │   │   │   ├── deployments/    # CRUD, chat, model recommendation
-│   │   │   ├── employees/      # Marketplace employee catalog
+│   │   │   ├── employees/      # Marketplace catalog (prebuilt + community)
+│   │   │   ├── integrations/   # Tool connections CRUD
+│   │   │   ├── marketplace/    # Community submission & publishing
 │   │   │   ├── purchases/      # Purchase/hire flow
+│   │   │   ├── performance/    # Performance metrics
 │   │   │   └── usage/          # Usage summary & quota status
+│   │   ├── custom-builder/     # Custom agent builder with prompt editor
 │   │   ├── dashboard/          # User dashboard
 │   │   ├── deploy/[id]/        # 3-stage deployment wizard + chat
+│   │   ├── integrations/       # Tool connections management page
 │   │   ├── marketplace/        # Employee catalog & detail pages
 │   │   └── performance/        # Performance tracking
-│   ├── components/             # Shared UI components (Navbar, ThemeProvider, etc.)
-│   ├── data/                   # Database initialization & seed data
+│   ├── components/             # Shared UI (Sidebar, Navbar, Providers)
+│   ├── data/                   # Seed data & employee definitions
 │   └── lib/
 │       ├── agents/             # AI agent engine
-│       │   ├── azure-openai-provider.ts  # Real Azure OpenAI integration
-│       │   ├── base-agent.ts             # Agent executor with metering
-│       │   ├── llm-provider.ts           # Provider factory & mock provider
-│       │   ├── model-recommender.ts      # Complexity scoring & model selection
-│       │   ├── model-registry.ts         # Model configurations & capabilities
-│       │   └── usage-meter.ts            # Quota reservation & usage tracking
+│       │   ├── agent-prompts.ts         # All 10 agent prompt definitions
+│       │   ├── agent-registry.ts        # Agent construction from DB
+│       │   ├── azure-openai-provider.ts # Azure OpenAI with function calling
+│       │   ├── base-agent.ts            # Agent executor with tool loop
+│       │   ├── llm-provider.ts          # Provider factory & mock provider
+│       │   ├── model-recommender.ts     # Complexity scoring & model selection
+│       │   ├── model-registry.ts        # Model configurations & capabilities
+│       │   ├── types.ts                 # Agent type definitions
+│       │   └── usage-meter.ts           # Quota reservation & usage tracking
+│       ├── tools/              # Tool integration framework
+│       │   ├── types.ts                 # ToolHandler interface & schemas
+│       │   ├── email-tool.ts            # Email (SendGrid/webhook/simulation)
+│       │   ├── crm-tool.ts              # CRM (webhook/built-in simulation)
+│       │   ├── calendar-tool.ts         # Calendar (webhook/built-in simulation)
+│       │   └── tool-executor.ts         # Central tool dispatcher
 │       ├── auth.ts             # JWT helpers
 │       └── db.ts               # SQLite connection & migration runner
 ├── data/
 │   └── migrations/             # SQL migration files (auto-applied on startup)
 │       ├── 001_initial_schema.sql
 │       ├── 002_agent_backend.sql
-│       └── 003_usage_metering.sql
+│       ├── 003_usage_metering.sql
+│       └── 004_custom_agents_community_tools.sql
 ├── .env.example                # Template for environment variables
 └── public/                     # Static assets
 ```
@@ -175,11 +230,38 @@ The platform supports two deployment models:
 ```
 User Message
     → BaseAgent.chat()
+        → buildSystemPrompt() — data-driven prompt assembly with customer config
         → resolveModel() — reads deployment's assigned model
         → reserveQuota() — atomic token reservation
-        → AzureOpenAIProvider.generate() — real LLM call
+        → AzureOpenAIProvider.generate() — real LLM call (with tool schemas)
+        ↺ Tool-calling loop (up to 5 rounds):
+            → Parse tool_calls from LLM response
+            → ToolExecutor.executeTool() — dispatch to email/CRM/calendar handler
+            → Feed tool results back to LLM
+            → LLM generates final response
         → reconcileUsage() — log actual tokens, release reservation
     → Response with metrics
+```
+
+### Agent Prompt Architecture
+```
+buildFullSystemPrompt(agentType, deploymentConfig)
+    → Base system prompt (unique per agent type)
+    → Deployment context (name, schedule)
+    → Tool instructions (only for tools the customer enabled)
+    → Data source instructions (only for connected data sources)
+    → Custom instructions (user-provided overrides)
+    → Knowledge base (injected by BaseAgent from DB)
+```
+
+### Tool Integration Architecture
+```
+User configures tool connections (Integrations page)
+    → Stored in user_tool_connections table
+    → Linked to deployments via deployment_tool_bindings
+    → Tools exposed to LLM as OpenAI function schemas
+    → Tool calls executed by handlers (real API, webhook, or simulation)
+    → Results logged in tool_execution_logs
 ```
 
 ### Model Recommendation Flow
@@ -192,39 +274,54 @@ Deploy Request
 ```
 
 ### Database Migrations
-Migrations are auto-applied on server startup via `src/lib/db.ts`. Each migration file in `data/migrations/` is tracked and only runs once.
+Migrations are auto-applied on server startup via `src/lib/db.ts`. Each migration file in `data/migrations/` is tracked and only runs once. Currently 4 migrations covering: initial schema, agent backend, usage metering, and custom agents/community/tools.
 
 ---
 
 ## 📋 API Endpoints
 
-| Method | Path                                    | Description                        |
-|--------|-----------------------------------------|------------------------------------|
-| POST   | `/api/auth/login`                       | User login                         |
-| POST   | `/api/auth/signup`                      | User registration                  |
-| POST   | `/api/auth/logout`                      | User logout                        |
-| GET    | `/api/auth/session`                     | Current session info               |
-| GET    | `/api/employees`                        | List marketplace employees         |
-| GET    | `/api/employees/[id]`                   | Employee details                   |
-| POST   | `/api/purchases`                        | Purchase/hire an employee          |
-| GET    | `/api/deployments`                      | List user's deployments            |
-| POST   | `/api/deployments`                      | Create deployment (with model rec) |
-| PATCH  | `/api/deployments/[id]`                 | Update deployment status           |
-| POST   | `/api/deployments/[id]/chat`            | Chat with deployed agent           |
-| GET    | `/api/deployments/[id]/conversations`   | List conversations                 |
-| GET    | `/api/deployments/[id]/tasks`           | List task logs                     |
-| POST   | `/api/deployments/recommend-model`      | Preview model recommendation       |
-| GET    | `/api/usage`                            | Usage summary & quota status       |
+| Method | Path                                    | Description                              |
+|--------|-----------------------------------------|------------------------------------------|
+| POST   | `/api/auth/login`                       | User login                               |
+| POST   | `/api/auth/signup`                      | User registration                        |
+| POST   | `/api/auth/logout`                      | User logout                              |
+| GET    | `/api/auth/session`                     | Current session info                     |
+| GET    | `/api/employees`                        | List marketplace employees (prebuilt + community) |
+| POST   | `/api/employees`                        | Create custom employee (with prompt, tools, knowledge) |
+| GET    | `/api/employees/[id]`                   | Employee details                         |
+| POST   | `/api/purchases`                        | Purchase/hire an employee                |
+| GET    | `/api/deployments`                      | List user's deployments                  |
+| POST   | `/api/deployments`                      | Create deployment (with model rec)       |
+| PATCH  | `/api/deployments/[id]`                 | Update deployment status                 |
+| POST   | `/api/deployments/[id]/chat`            | Chat with deployed agent (with tools)    |
+| GET    | `/api/deployments/[id]/conversations`   | List conversations                       |
+| GET    | `/api/deployments/[id]/tasks`           | List task logs                           |
+| POST   | `/api/deployments/recommend-model`      | Preview model recommendation             |
+| GET    | `/api/integrations`                     | List tool connections & available tools   |
+| POST   | `/api/integrations`                     | Add a tool connection                    |
+| DELETE | `/api/integrations?id=...`              | Remove a tool connection                 |
+| POST   | `/api/marketplace/submit`               | Publish custom agent to marketplace      |
+| GET    | `/api/marketplace/submit`               | List user's submissions                  |
+| GET    | `/api/usage`                            | Usage summary & quota status             |
+| GET    | `/api/performance`                      | Performance metrics                      |
 
 ---
 
 ## 🗺️ Roadmap
 
-- [ ] Custom agent builder with marketplace publishing
-- [ ] Admin panel for agent submission approval
+- [x] Pre-built marketplace with 10 AI employees
+- [x] 3-stage deployment flow with model recommendation
+- [x] Real-time AI chat with knowledge base injection
+- [x] Data-driven agent prompt system for all 10 agent types
+- [x] Custom agent builder (system prompt, tools, knowledge, instructions)
+- [x] Community marketplace (publish & discover user-created agents)
+- [x] Tool integrations (email, CRM, calendar) with function calling
+- [x] Usage metering & quota system
+- [ ] Admin panel for agent submission review
 - [ ] Bring Your Own Key (BYOK) for enterprise customers
 - [ ] Additional LLM providers (Anthropic, Groq, AWS Bedrock)
 - [ ] Usage analytics dashboard with charts
+- [ ] Real Google Calendar & SendGrid API integrations
 - [ ] Settings & profile page
 - [ ] Mobile responsive polish
 - [ ] Production deployment (Vercel / Azure)
