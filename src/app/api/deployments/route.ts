@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
   const { id, employee_id, name, config } = body;
 
   db.prepare(`
-    INSERT INTO deployments (id, user_id, employee_id, name, status, config)
-    VALUES (?, ?, ?, ?, 'configuring', ?)
+    INSERT INTO deployments (id, user_id, employee_id, name, status, config, deployed_at)
+    VALUES (?, ?, ?, ?, 'active', ?, datetime('now'))
   `).run(id, user.id, employee_id, name, JSON.stringify(config));
 
   return NextResponse.json({ success: true, id });

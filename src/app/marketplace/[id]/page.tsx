@@ -109,7 +109,7 @@ export default function EmployeeDetailPage() {
         }),
       });
       if (res.ok) {
-        router.push("/deploy");
+        router.push(`/deploy/${employee.id}`);
       }
     } catch {
       // handle error silently

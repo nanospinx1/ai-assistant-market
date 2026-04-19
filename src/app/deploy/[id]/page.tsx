@@ -151,13 +151,19 @@ export default function DeployConfigPage() {
       setProgress((p) => Math.min(p + Math.random() * 15, 90));
     }, 400);
     try {
+      const deployId = crypto.randomUUID();
       await fetch("/api/deployments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          employeeId,
-          userId: user?.id,
-          ...config,
+          id: deployId,
+          employee_id: employeeId,
+          name: config.name,
+          config: {
+            tools: config.tools,
+            dataSources: config.dataSources,
+            schedule: config.schedule,
+          },
         }),
       });
       clearInterval(interval);
