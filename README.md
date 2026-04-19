@@ -17,7 +17,8 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 - Browse **10 pre-built AI employees** across 8 categories (Customer Support, Sales Rep, Bookkeeper, Data Analyst, Content Writer, Social Media Manager, HR Assistant, IT Helpdesk, Project Manager, Virtual Receptionist)
 - Category-based filtering and search (including a "Community" tab for user-published agents)
 - Detailed employee profiles with capabilities, pricing, and ratings
-- Community agents display a green "Community" badge
+- Community agents display a green "Community" badge with portfolio info (specialty, tools, use cases)
+- **Privacy-first**: Marketplace shows only public agents — private custom agents never appear
 - Light & dark mode with seamless theme switching
 
 ### 🧠 Data-Driven Agent Prompt System
@@ -30,6 +31,8 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 1. **Select & Configure** — Choose tools, data sources, knowledge base, and schedule
 2. **Review & Recommend** — AI-powered model recommendation engine analyzes task complexity and suggests the optimal model
 3. **Deploy** — One-click deployment with real-time status tracking
+- **Name Your Employee** — Give your AI employee a human name (e.g., "Sarah"); agent type becomes their job title
+- Consistent flow for both prebuilt and custom agents
 - Knowledge is seeded at deployment creation time (not just activation)
 - Agent snapshot frozen at deploy time so later edits don't affect running deployments
 
@@ -44,19 +47,43 @@ A full-stack marketplace where small businesses can **hire, deploy, and manage A
 ### 🔧 Custom Agent Builder
 - **System prompt editor** — define the core behavior and personality (advanced, optional)
 - **Custom instructions** — add rules, tone guidelines, or constraints
-- **Default tools picker** — select which tools (Email, CRM, Calendar) the agent can use
-- **Knowledge base editor** — add/remove reference documents, FAQs, or policies with title + content
 - **Capabilities & pricing** — define skills and auto-calculated pricing
 - **Live marketplace preview** — see how your agent will appear in the catalog as you build
+- Tools and knowledge configured during the deploy step (same flow as prebuilt agents)
 - All settings stored in DB and used during deployment
+
+### 🎓 Agent Onboarding (Post-Deployment Training)
+Just like training a new human employee, onboard your AI after deployment:
+- **Connect Tools** — Link email, CRM, calendar, and other integrations with configuration notes
+- **Company Knowledge** — Upload documents, FAQs, and policies for the agent to reference
+- **Tasks & Expectations** — Define key responsibilities, performance expectations, and escalation rules
+- **Test Drive** — Live chat to test your agent before going live
+- Progress tracking across all tabs; "Complete Onboarding & Go Live" to activate
+
+### 🔒 Agent Privacy & Publishing
+- **Private by default** — Custom agents are only visible to the creator in Deployments
+- **🔒 Private / 🌐 Published badges** — Clear visibility on every deployment card
+- **Publish Portfolio** — Structured publish form with:
+  - Specialty description (what the agent excels at)
+  - Tool integrations (which platforms it connects to)
+  - Target audience tags (industry, business size)
+  - Sample use cases (real examples of tasks handled)
+- **Quality Gates** — Agents must pass all checks before publishing:
+  - Minimum 7 days deployed and active
+  - 80%+ performance score
+  - Onboarding completed
+  - Portfolio fully filled out (100+ char specialty, 2+ tools, 2+ use cases)
+- **Server-side validation** — Quality gates enforced on the backend (can't be bypassed)
+- **Sanitized snapshots** — Private data (system prompts, API keys, company knowledge) is never included in marketplace listings
 
 ### 🌐 Community Marketplace
 - **Publish custom agents** for other users to discover and deploy
-- Auto-approve flow for MVP (instant publishing)
-- Community agents appear in the marketplace with a green "Community" badge
+- **Quality-gated publishing** — only battle-tested, well-documented agents make it to the marketplace
+- Community agents appear with portfolio info: specialty, tools, target audience, use cases
 - Dedicated "Community" category filter tab
-- Snapshot-based publishing — your agent definition is frozen at publish time
+- Snapshot-based publishing — agent definition frozen at publish time, private data excluded
 - Install tracking per community agent
+- Auto-approve for MVP; admin review dashboard planned
 
 ### 🔌 Tool Integrations
 - **Email Tool** — Send emails, draft messages, manage templates (SendGrid API, webhook, or simulation mode)
@@ -125,7 +152,7 @@ ai-assistant-market/
 │   ├── app/                    # Next.js App Router pages & API routes
 │   │   ├── api/
 │   │   │   ├── auth/           # Login, signup, logout, session endpoints
-│   │   │   ├── deployments/    # CRUD, chat, model recommendation
+│   │   │   ├── deployments/    # CRUD, chat, model recommendation, onboarding
 │   │   │   ├── employees/      # Marketplace catalog (prebuilt + community)
 │   │   │   ├── integrations/   # Tool connections CRUD
 │   │   │   ├── marketplace/    # Community submission & publishing
@@ -134,7 +161,8 @@ ai-assistant-market/
 │   │   │   └── usage/          # Usage summary & quota status
 │   │   ├── custom-builder/     # Custom agent builder with prompt editor
 │   │   ├── dashboard/          # User dashboard
-│   │   ├── deploy/[id]/        # 3-stage deployment wizard + chat
+│   │   ├── deploy/[id]/        # 3-stage deployment wizard + chat + onboarding
+│   │   ├── deploy/publish/[id] # Agent portfolio & publish flow
 │   │   ├── integrations/       # Tool connections management page
 │   │   ├── marketplace/        # Employee catalog & detail pages
 │   │   └── performance/        # Performance tracking
@@ -300,8 +328,10 @@ Migrations are auto-applied on server startup via `src/lib/db.ts`. Each migratio
 | GET    | `/api/integrations`                     | List tool connections & available tools   |
 | POST   | `/api/integrations`                     | Add a tool connection                    |
 | DELETE | `/api/integrations?id=...`              | Remove a tool connection                 |
-| POST   | `/api/marketplace/submit`               | Publish custom agent to marketplace      |
-| GET    | `/api/marketplace/submit`               | List user's submissions                  |
+| POST   | `/api/marketplace/submit`               | Publish agent with portfolio (quality-gated) |
+| GET    | `/api/marketplace/submit`               | List user's submissions (optional ?employeeId filter) |
+| GET    | `/api/deployments/[id]/onboarding`      | Get deployment onboarding data           |
+| PUT    | `/api/deployments/[id]/onboarding`      | Update onboarding data (tools, knowledge, tasks) |
 | GET    | `/api/usage`                            | Usage summary & quota status             |
 | GET    | `/api/performance`                      | Performance metrics                      |
 
@@ -317,6 +347,10 @@ Migrations are auto-applied on server startup via `src/lib/db.ts`. Each migratio
 - [x] Community marketplace (publish & discover user-created agents)
 - [x] Tool integrations (email, CRM, calendar) with function calling
 - [x] Usage metering & quota system
+- [x] Agent onboarding flow (connect tools, company knowledge, tasks, test drive)
+- [x] Agent privacy (private by default, published badges, sanitized snapshots)
+- [x] Publish portfolio with quality gates (specialty, tools, use cases, readiness score)
+- [x] Employee naming convention (human names + job titles)
 - [ ] Admin panel for agent submission review
 - [ ] Bring Your Own Key (BYOK) for enterprise customers
 - [ ] Additional LLM providers (Anthropic, Groq, AWS Bedrock)
