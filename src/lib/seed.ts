@@ -2,6 +2,7 @@ import { getDb } from "./db";
 import { prebuiltEmployees } from "@/data/employees";
 import bcryptjs from "bcryptjs";
 import { v4 as uuid } from "uuid";
+import { getAgentDefinition } from "./agents/agent-prompts";
 
 export function seedDatabase() {
   const db = getDb();
@@ -34,10 +35,17 @@ export function seedDatabase() {
     );
   }
 
-  // Set agent_type for known agents
+  // Set agent_type for ALL agents (canonical types matching agent-prompts.ts)
   db.prepare("UPDATE ai_employees SET agent_type = 'customer-support' WHERE id = 'emp-customer-support'").run();
-  db.prepare("UPDATE ai_employees SET agent_type = 'data-analyst' WHERE id = 'emp-data-analyst'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'sales-assistant' WHERE id = 'emp-sales-assistant'").run();
   db.prepare("UPDATE ai_employees SET agent_type = 'content-writer' WHERE id = 'emp-content-writer'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'bookkeeper' WHERE id = 'emp-bookkeeper'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'data-analyst' WHERE id = 'emp-data-analyst'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'social-media' WHERE id = 'emp-social-media'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'hr-assistant' WHERE id = 'emp-hr-assistant'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'it-helpdesk' WHERE id = 'emp-it-helpdesk'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'project-manager' WHERE id = 'emp-project-manager'").run();
+  db.prepare("UPDATE ai_employees SET agent_type = 'receptionist' WHERE id = 'emp-receptionist'").run();
 
   // Create some demo deployments and purchases for the first user
   const userId = demoUsers[0].id;
@@ -61,17 +69,47 @@ export function seedDatabase() {
   `);
 
   const defaultConfig = JSON.stringify({
-    tools: ["email", "chat"],
-    data_sources: ["knowledge_base"],
-    schedule: "24/7",
+    tools: ["Email", "Live Chat"],
+    dataSources: ["Knowledge Base"],
+    schedule: "24/7 Always On",
     notifications: true,
     auto_scale: false,
   });
+
+  // Map employee IDs to their agent types for knowledge seeding
+  const agentTypeMap: Record<string, string> = {
+    "emp-customer-support": "customer-support",
+    "emp-sales-assistant": "sales-assistant",
+    "emp-content-writer": "content-writer",
+    "emp-bookkeeper": "bookkeeper",
+    "emp-data-analyst": "data-analyst",
+    "emp-social-media": "social-media",
+    "emp-hr-assistant": "hr-assistant",
+    "emp-it-helpdesk": "it-helpdesk",
+    "emp-project-manager": "project-manager",
+    "emp-receptionist": "receptionist",
+  };
+
+  const insertKnowledge = db.prepare(`
+    INSERT INTO knowledge_sources (id, deployment_id, title, content, source_type)
+    VALUES (?, ?, ?, ?, ?)
+  `);
 
   for (const dep of deployments) {
     insertDeployment.run(dep.id, userId, dep.employee_id, dep.name, dep.status, defaultConfig, dep.deployed_at);
     const emp = prebuiltEmployees.find(e => e.id === dep.employee_id)!;
     insertPurchase.run(uuid(), userId, dep.employee_id, "monthly", emp.price_monthly, "active");
+
+    // Seed default knowledge for this agent type
+    const agentType = agentTypeMap[dep.employee_id];
+    if (agentType) {
+      const definition = getAgentDefinition(agentType);
+      if (definition) {
+        for (const ks of definition.defaultKnowledge) {
+          insertKnowledge.run(uuid(), dep.id, ks.title, ks.content, ks.sourceType);
+        }
+      }
+    }
 
     // Generate performance metrics for last 30 days
     for (let i = 30; i >= 0; i--) {

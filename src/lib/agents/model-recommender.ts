@@ -30,18 +30,18 @@ interface AlternativeModel {
   tradeoff: string;
 }
 
-// Complexity weights per agent type
+// Complexity weights per agent type (canonical IDs matching agent-prompts.ts)
 const AGENT_TYPE_COMPLEXITY: Record<string, number> = {
   "customer-support": 1.0,
-  "content-writer": 2.0,
-  "social-media": 1.5,
-  "email-marketing": 1.5,
-  "scheduler": 1.0,
-  "hr-assistant": 2.0,
-  "data-analyst": 3.5,
-  "it-support": 2.5,
   "sales-assistant": 2.0,
-  "accountant": 3.0,
+  "content-writer": 2.0,
+  "bookkeeper": 3.0,
+  "data-analyst": 3.5,
+  "social-media": 1.5,
+  "hr-assistant": 2.0,
+  "it-helpdesk": 2.5,
+  "project-manager": 2.0,
+  "receptionist": 1.0,
   "generic": 2.0,
 };
 

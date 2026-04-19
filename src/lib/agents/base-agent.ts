@@ -5,6 +5,7 @@ import { getLLMProvider } from "./llm-provider";
 import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
 import { reserveQuota, reconcileUsage, releaseReservation, QuotaExceededError } from "./usage-meter";
+import { buildFullSystemPrompt } from "./agent-prompts";
 
 export class BaseAgent {
   protected config: AgentConfig;
@@ -14,11 +15,21 @@ export class BaseAgent {
   }
 
   /**
-   * Build the system prompt including knowledge sources.
+   * Build the system prompt by merging:
+   * 1. Agent-type-specific prompt with customer config (from agent-prompts.ts)
+   * 2. Knowledge sources loaded from the database
    */
   protected buildSystemPrompt(): string {
-    let prompt = this.config.systemPrompt;
+    // Use the data-driven prompt builder if we have a known agent type
+    let prompt: string;
+    if (this.config.agentType && this.config.agentType !== "generic") {
+      prompt = buildFullSystemPrompt(this.config.agentType, this.config.deploymentConfig || {});
+    } else {
+      // Fallback: use whatever systemPrompt was passed in config (custom agents)
+      prompt = this.config.systemPrompt || "You are a helpful AI assistant. Respond professionally and helpfully to all requests.";
+    }
 
+    // Append knowledge sources
     if (this.config.knowledgeSources.length > 0) {
       prompt += "\n\n--- Knowledge Base ---\n";
       for (const source of this.config.knowledgeSources) {

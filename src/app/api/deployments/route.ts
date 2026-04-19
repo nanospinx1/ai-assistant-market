@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
 import { requireAuth } from "@/lib/auth";
 import { recommendModel } from "@/lib/agents/model-recommender";
+import { seedDeploymentKnowledge } from "@/lib/agents/agent-registry";
 
 export async function GET() {
   const { user, error } = await requireAuth();
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     toolsCount: Array.isArray(config?.tools) ? config.tools.length : 0,
     dataSourcesCount: Array.isArray(config?.dataSources) ? config.dataSources.length : 0,
     capabilitiesCount: capabilities.length,
-    knowledgeContentSize: employee?.agent_type === "customer-support" ? 3000 : 0,
+    knowledgeContentSize: employee?.agent_type ? 2000 : 0,
     schedule: config?.schedule || "24/7 Always On",
   });
 
@@ -59,6 +60,10 @@ export async function POST(req: NextRequest) {
     INSERT INTO deployments (id, user_id, employee_id, name, status, config, default_model, model_tier, deployed_at)
     VALUES (?, ?, ?, ?, 'active', ?, ?, ?, datetime('now'))
   `).run(id, user.id, employee_id, name, JSON.stringify(config), recommendation.modelId, recommendation.tier);
+
+  // Seed default knowledge sources for this agent type
+  const agentType = employee?.agent_type || "generic";
+  seedDeploymentKnowledge(id, agentType);
 
   return NextResponse.json({
     success: true,

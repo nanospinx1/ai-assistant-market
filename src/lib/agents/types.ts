@@ -11,6 +11,14 @@ export interface AgentConfig {
   capabilities: string[];
   tools: AgentTool[];
   knowledgeSources: KnowledgeSource[];
+  /** Customer-configured deployment settings (tools, data sources, schedule) */
+  deploymentConfig?: {
+    deploymentName?: string;
+    tools?: string[];
+    dataSources?: string[];
+    schedule?: string;
+    customInstructions?: string;
+  };
 }
 
 export interface AgentTool {
