@@ -56,10 +56,6 @@ const SUGGESTED_CAPS = [
   "Ticket Management",
 ];
 
-interface KnowledgeEntry {
-  title: string;
-  content: string;
-}
 
 interface EmployeeForm {
   name: string;
@@ -70,15 +66,9 @@ interface EmployeeForm {
   price: number;
   systemPrompt: string;
   customInstructions: string;
-  defaultTools: string[];
-  knowledge: KnowledgeEntry[];
 }
 
-const AVAILABLE_TOOLS = [
-  { id: "email", label: "Email", icon: "📧" },
-  { id: "crm", label: "CRM", icon: "👥" },
-  { id: "calendar", label: "Calendar", icon: "📅" },
-];
+
 
 export default function CustomBuilderPage() {
   const { user, loading: authLoading } = useAuth();
@@ -94,11 +84,7 @@ export default function CustomBuilderPage() {
     price: 49,
     systemPrompt: "",
     customInstructions: "",
-    defaultTools: [],
-    knowledge: [],
   });
-  const [knowledgeTitle, setKnowledgeTitle] = useState("");
-  const [knowledgeContent, setKnowledgeContent] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -141,10 +127,7 @@ export default function CustomBuilderPage() {
           capabilities: form.capabilities,
           price_monthly: form.price,
           price_yearly: form.price * 10,
-          system_prompt: form.systemPrompt || undefined,
           custom_instructions: form.customInstructions || undefined,
-          default_tools: form.defaultTools.length > 0 ? form.defaultTools : undefined,
-          default_knowledge: form.knowledge.length > 0 ? form.knowledge : undefined,
         }),
       });
       if (res.ok) {
@@ -327,109 +310,6 @@ export default function CustomBuilderPage() {
               className="w-full px-4 py-3 rounded-xl outline-none resize-none placeholder-[#64748B] focus:border-indigo-500 transition-colors"
               style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
             />
-          </div>
-
-          {/* Default Tools */}
-          <div className="rounded-2xl p-6 space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
-            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
-              Default Tools
-            </h3>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Select tools this employee can use. Users can configure their own connections in Integrations.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {AVAILABLE_TOOLS.map((tool) => {
-                const active = form.defaultTools.includes(tool.id);
-                return (
-                  <button
-                    key={tool.id}
-                    onClick={() =>
-                      setForm((f) => ({
-                        ...f,
-                        defaultTools: active
-                          ? f.defaultTools.filter((t) => t !== tool.id)
-                          : [...f.defaultTools, tool.id],
-                      }))
-                    }
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all border ${
-                      active ? "border-indigo-500 bg-indigo-500/15 text-indigo-400" : ""
-                    }`}
-                    style={!active ? { background: "var(--bg-primary)", borderColor: "var(--border-primary)", color: "var(--text-secondary)" } : undefined}
-                  >
-                    <span>{tool.icon}</span> {tool.label}
-                    {active && <span className="text-xs">✓</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Knowledge Base */}
-          <div className="rounded-2xl p-6 space-y-4" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
-            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
-              Knowledge Base
-            </h3>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Add reference documents, FAQs, or policies that the AI employee should know about.
-            </p>
-
-            {form.knowledge.length > 0 && (
-              <div className="space-y-2">
-                {form.knowledge.map((entry, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-2 p-3 rounded-xl"
-                    style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)" }}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{entry.title}</h4>
-                      <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{entry.content.slice(0, 100)}...</p>
-                    </div>
-                    <button
-                      onClick={() => setForm((f) => ({ ...f, knowledge: f.knowledge.filter((_, idx) => idx !== i) }))}
-                      className="p-1 hover:opacity-70"
-                    >
-                      <X size={14} style={{ color: "var(--text-muted)" }} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={knowledgeTitle}
-                onChange={(e) => setKnowledgeTitle(e.target.value)}
-                placeholder="Title (e.g., Return Policy, FAQ)"
-                className="w-full px-4 py-2.5 rounded-xl outline-none text-sm placeholder-[#64748B] focus:border-indigo-500 transition-colors"
-                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
-              />
-              <textarea
-                value={knowledgeContent}
-                onChange={(e) => setKnowledgeContent(e.target.value)}
-                placeholder="Content..."
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl outline-none resize-none text-sm placeholder-[#64748B] focus:border-indigo-500 transition-colors"
-                style={{ background: "var(--bg-primary)", border: "1px solid var(--border-primary)", color: "var(--text-primary)" }}
-              />
-              <button
-                onClick={() => {
-                  if (knowledgeTitle.trim() && knowledgeContent.trim()) {
-                    setForm((f) => ({
-                      ...f,
-                      knowledge: [...f.knowledge, { title: knowledgeTitle.trim(), content: knowledgeContent.trim() }],
-                    }));
-                    setKnowledgeTitle("");
-                    setKnowledgeContent("");
-                  }
-                }}
-                disabled={!knowledgeTitle.trim() || !knowledgeContent.trim()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-white disabled:opacity-40 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all"
-              >
-                <Plus size={14} /> Add Knowledge Entry
-              </button>
-            </div>
           </div>
 
           {/* Capabilities */}
