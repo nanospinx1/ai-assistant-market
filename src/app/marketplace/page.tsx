@@ -17,6 +17,7 @@ import {
   Filter,
   ArrowRight,
   SlidersHorizontal,
+  Globe,
 } from "lucide-react";
 import { AIEmployee } from "@/lib/types";
 import { categories } from "@/data/employees";
@@ -30,6 +31,7 @@ const categoryConfig: Record<string, { icon: any; gradient: string }> = {
   "Human Resources": { icon: Users, gradient: "from-sky-500 to-blue-500" },
   "IT Support": { icon: Monitor, gradient: "from-slate-400 to-zinc-500" },
   "Operations": { icon: Settings, gradient: "from-indigo-500 to-blue-500" },
+  "Community": { icon: Globe, gradient: "from-emerald-500 to-cyan-500" },
 };
 
 const defaultConfig = { icon: Briefcase, gradient: "from-gray-500 to-slate-500" };
@@ -56,8 +58,14 @@ export default function MarketplacePage() {
 
   const filtered = useMemo(() => {
     return employees.filter((emp) => {
-      const matchesCategory =
-        activeCategory === "All" || emp.category === activeCategory;
+      let matchesCategory: boolean;
+      if (activeCategory === "All") {
+        matchesCategory = true;
+      } else if (activeCategory === "Community") {
+        matchesCategory = !emp.is_prebuilt;
+      } else {
+        matchesCategory = emp.category === activeCategory;
+      }
       const q = searchQuery.toLowerCase();
       const matchesSearch =
         !q ||
@@ -183,6 +191,11 @@ export default function MarketplacePage() {
                   <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/30 text-white backdrop-blur-sm">
                     {emp.category}
                   </span>
+                  {!emp.is_prebuilt && (
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/80 text-white backdrop-blur-sm">
+                      Community
+                    </span>
+                  )}
                 </div>
 
                 {/* Avatar Icon */}

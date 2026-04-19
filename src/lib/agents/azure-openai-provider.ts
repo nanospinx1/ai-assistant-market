@@ -61,6 +61,8 @@ export class AzureOpenAIProvider implements LLMProvider {
     const formattedMessages = messages.map((m) => ({
       role: m.role,
       content: m.content,
+      ...(m.metadata?.tool_call_id ? { tool_call_id: m.metadata.tool_call_id } : {}),
+      ...(m.metadata?.tool_calls ? { tool_calls: m.metadata.tool_calls } : {}),
     }));
 
     const body: Record<string, any> = {
@@ -71,6 +73,12 @@ export class AzureOpenAIProvider implements LLMProvider {
     // Reasoning models (o4-mini) don't support temperature
     if (!model.id.startsWith("o4")) {
       body.temperature = options?.temperature ?? 0.7;
+    }
+
+    // Include tools for function calling if provided
+    if (options?.tools && options.tools.length > 0) {
+      body.tools = options.tools;
+      body.tool_choice = "auto";
     }
 
     return body;
@@ -87,7 +95,7 @@ export class AzureOpenAIProvider implements LLMProvider {
 
     const usage = data.usage || {};
 
-    return {
+    const response: LLMResponse = {
       content: choice.message?.content || "",
       finishReason: this.mapFinishReason(choice.finish_reason),
       usage: {
@@ -98,6 +106,18 @@ export class AzureOpenAIProvider implements LLMProvider {
       latencyMs,
       model: modelId,
     };
+
+    // Parse tool calls if present
+    if (choice.message?.tool_calls && choice.message.tool_calls.length > 0) {
+      response.toolCalls = choice.message.tool_calls.map((tc: any) => ({
+        id: tc.id,
+        name: tc.function.name,
+        arguments: JSON.parse(tc.function.arguments || "{}"),
+      }));
+      response.finishReason = "tool_call";
+    }
+
+    return response;
   }
 
   private mapFinishReason(reason: string): LLMResponse["finishReason"] {

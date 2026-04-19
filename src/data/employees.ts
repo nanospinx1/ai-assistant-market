@@ -173,4 +173,5 @@ export const categories = [
   "Human Resources",
   "IT Support",
   "Operations",
+  "Community",
 ];

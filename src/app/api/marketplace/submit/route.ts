@@ -30,14 +30,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Check for existing pending submission
+  // Check for existing submission
   const existing = db
-    .prepare("SELECT * FROM marketplace_submissions WHERE employee_id = ? AND status = 'pending'")
+    .prepare("SELECT * FROM marketplace_submissions WHERE employee_id = ? AND status IN ('pending', 'approved')")
     .get(employeeId) as any;
 
   if (existing) {
     return NextResponse.json(
-      { error: "This employee already has a pending submission" },
+      { error: "This employee has already been published to the marketplace" },
       { status: 409 }
     );
   }
@@ -60,10 +60,16 @@ export async function POST(req: NextRequest) {
   const submissionId = uuid();
   db.prepare(`
     INSERT INTO marketplace_submissions (id, employee_id, submitted_by, status, snapshot)
-    VALUES (?, ?, ?, 'pending', ?)
+    VALUES (?, ?, ?, 'approved', ?)
   `).run(submissionId, employeeId, user.id, snapshot);
 
-  return NextResponse.json({ success: true, id: submissionId, status: "pending" });
+  // Auto-approve for MVP: mark the employee as published
+  db.prepare(`
+    UPDATE ai_employees SET is_published = 1, publish_status = 'approved', publisher_name = ?
+    WHERE id = ?
+  `).run(user.name || user.email, employeeId);
+
+  return NextResponse.json({ success: true, id: submissionId, status: "approved" });
 }
 
 export async function GET() {

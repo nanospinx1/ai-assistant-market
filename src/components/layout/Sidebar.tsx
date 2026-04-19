@@ -16,6 +16,7 @@ import {
   Bot,
   Sun,
   Moon,
+  Plug,
 } from "lucide-react";
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/deploy", label: "Deployments", icon: Rocket },
   { href: "/performance", label: "Performance", icon: BarChart3 },
   { href: "/custom-builder", label: "Custom Builder", icon: Wrench },
+  { href: "/integrations", label: "Integrations", icon: Plug },
 ];
 
 export default function Sidebar() {

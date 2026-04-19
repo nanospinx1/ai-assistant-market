@@ -6,6 +6,9 @@ import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
 import { reserveQuota, reconcileUsage, releaseReservation, QuotaExceededError } from "./usage-meter";
 import { buildFullSystemPrompt } from "./agent-prompts";
+import { getToolSchemas, executeTool } from "../tools/tool-executor";
+
+const MAX_TOOL_ROUNDS = 5; // prevent infinite tool-calling loops
 
 export class BaseAgent {
   protected config: AgentConfig;
@@ -114,8 +117,64 @@ export class BaseAgent {
     }
 
     try {
-      // Generate response with model selection
-      const llmResponse = await llm.generate(messages, { model });
+      // Get tool schemas if agent has tools configured
+      const enabledTools = this.config.deploymentConfig?.tools || [];
+      const toolSchemas = getToolSchemas(enabledTools);
+
+      // Generate response with model selection (and tools if available)
+      let llmResponse = await llm.generate(messages, {
+        model,
+        ...(toolSchemas.length > 0 ? { tools: toolSchemas } : {}),
+      });
+
+      // Tool-calling loop: execute tool calls and feed results back to LLM
+      let toolRounds = 0;
+      let totalTokens = llmResponse.usage.totalTokens;
+      while (llmResponse.finishReason === "tool_call" && llmResponse.toolCalls && toolRounds < MAX_TOOL_ROUNDS) {
+        toolRounds++;
+
+        // Add assistant message with tool_calls metadata to history
+        messages.push({
+          role: "assistant",
+          content: llmResponse.content || "",
+          metadata: {
+            tool_calls: llmResponse.toolCalls.map((tc) => ({
+              id: tc.id,
+              type: "function",
+              function: { name: tc.name, arguments: JSON.stringify(tc.arguments) },
+            })),
+          },
+        });
+
+        // Execute each tool call and add results as "tool" role messages
+        for (const tc of llmResponse.toolCalls) {
+          const result = await executeTool(
+            tc.name,
+            tc.arguments,
+            this.config.deploymentId,
+            conversationId,
+            userId
+          );
+          // Tool results go back as role=tool messages (OpenAI format)
+          messages.push({
+            role: "system" as any, // will be mapped to "tool" in provider
+            content: JSON.stringify(result.output || result.error),
+            metadata: { tool_call_id: tc.id, _role: "tool" },
+          });
+        }
+
+        // Call LLM again with tool results
+        llmResponse = await llm.generate(
+          // Re-map messages: convert _role=tool entries for the provider
+          messages.map((m) =>
+            m.metadata?._role === "tool"
+              ? { ...m, role: "system" as any } // The provider formats these with tool_call_id
+              : m
+          ),
+          { model, ...(toolSchemas.length > 0 ? { tools: toolSchemas } : {}) }
+        );
+        totalTokens += llmResponse.usage.totalTokens;
+      }
 
       // Insert assistant message
       const assistantMsgId = uuid();
@@ -128,8 +187,9 @@ export class BaseAgent {
         llmResponse.content,
         JSON.stringify({
           model: llmResponse.model,
-          usage: llmResponse.usage,
+          usage: { ...llmResponse.usage, totalTokens },
           latencyMs: llmResponse.latencyMs,
+          toolRounds: toolRounds > 0 ? toolRounds : undefined,
         })
       );
 
@@ -137,7 +197,7 @@ export class BaseAgent {
       db.prepare(`
         UPDATE task_logs SET status = 'completed', output = ?, duration_ms = ?, tokens_used = ?
         WHERE id = ?
-      `).run(llmResponse.content, llmResponse.latencyMs, llmResponse.usage.totalTokens, taskLogId);
+      `).run(llmResponse.content, llmResponse.latencyMs, totalTokens, taskLogId);
 
       // Update conversation timestamp
       db.prepare("UPDATE conversations SET updated_at = datetime('now') WHERE id = ?").run(conversationId);
@@ -152,7 +212,7 @@ export class BaseAgent {
         provider: process.env.LLM_PROVIDER || "mock",
         promptTokens: llmResponse.usage.promptTokens,
         completionTokens: llmResponse.usage.completionTokens,
-        totalTokens: llmResponse.usage.totalTokens,
+        totalTokens,
         latencyMs: llmResponse.latencyMs,
         status: "success",
       });

@@ -10,6 +10,7 @@ export interface LLMOptions {
   temperature?: number;
   maxTokens?: number;
   model?: string;
+  tools?: any[]; // OpenAI function calling tool schemas
 }
 
 /**
