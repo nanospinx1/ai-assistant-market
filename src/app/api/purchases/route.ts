@@ -16,11 +16,19 @@ export async function POST(req: NextRequest) {
 
   const amount = plan === "yearly" ? emp.price_yearly : emp.price_monthly;
   const purchaseId = uuid();
+  const deploymentId = uuid();
 
+  // Create purchase
   db.prepare(`
     INSERT INTO purchases (id, user_id, employee_id, plan, amount, status)
     VALUES (?, ?, ?, ?, ?, 'active')
   `).run(purchaseId, user.id, employee_id, plan, amount);
 
-  return NextResponse.json({ success: true, id: purchaseId });
+  // Auto-create deployment so it appears on dashboard and deployments page
+  db.prepare(`
+    INSERT INTO deployments (id, user_id, employee_id, name, status, config)
+    VALUES (?, ?, ?, ?, 'configuring', ?)
+  `).run(deploymentId, user.id, employee_id, emp.name, JSON.stringify({ plan }));
+
+  return NextResponse.json({ success: true, id: purchaseId, deploymentId });
 }
