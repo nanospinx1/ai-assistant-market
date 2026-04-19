@@ -194,7 +194,7 @@ export default function MarketplacePage() {
 
                 {/* Role & Name */}
                 <div className="px-6 flex-1">
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-0.5 group-hover:text-white transition-colors">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-0.5 group-hover:text-[var(--primary)] transition-colors">
                     {emp.role}
                   </h3>
                   <p className="text-sm text-[var(--text-secondary)] mb-2">
@@ -224,7 +224,7 @@ export default function MarketplacePage() {
                         <span className="text-xs font-normal text-[var(--text-muted)]">/mo</span>
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--primary)] group-hover:text-white transition-colors">
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--primary)] group-hover:text-[var(--primary-light)] transition-colors">
                       View Details
                       <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
                     </span>
