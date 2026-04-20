@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSession, initializeDb } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
+import { seedDatabase } from "@/lib/seed";
 
 export async function GET() {
-  initializeDb();
+  seedDatabase();
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ user: null });

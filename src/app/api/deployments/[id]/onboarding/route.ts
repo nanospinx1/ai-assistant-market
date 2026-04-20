@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
 import { requireAuth, verifyDeploymentOwnership } from "@/lib/auth";
-import { logActivity } from "@/lib/activity-logger";
+import * as EmployeeRepo from "@/lib/repositories/employees";
+import * as DeploymentRepo from "@/lib/repositories/deployments";
+import * as ActivityRepo from "@/lib/repositories/activity";
 
 export async function GET(
   _req: NextRequest,
@@ -16,25 +17,13 @@ export async function GET(
 
   const config = JSON.parse(deployment.config || "{}");
   const onboarding = config.onboarding || {
-    connectedTools: [],
-    knowledge: [],
-    tasks: [],
-    expectations: {
-      tone: "Professional",
-      qualityStandards: "",
-      escalationRules: "",
-    },
+    connectedTools: [], knowledge: [], tasks: [],
+    expectations: { tone: "Professional", qualityStandards: "", escalationRules: "" },
     completed: false,
   };
 
-  // Also include the parent employee definition
-  const employee = getDb()
-    .prepare("SELECT * FROM ai_employees WHERE id = ?")
-    .get(deployment.employee_id) as any;
-
-  const capabilities = employee?.capabilities
-    ? JSON.parse(employee.capabilities)
-    : [];
+  const employee = EmployeeRepo.findById(deployment.employee_id);
+  const capabilities = employee?.capabilities ? JSON.parse(employee.capabilities) : [];
 
   return NextResponse.json({
     deploymentId,
@@ -73,54 +62,23 @@ export async function PUT(
   if (ownerError) return ownerError;
 
   const body = await req.json();
-  const db = getDb();
   const config = JSON.parse(deployment.config || "{}");
 
-  // If approvalSettings sent separately, merge at top level
-  if (body.approvalSettings) {
-    config.approvalSettings = body.approvalSettings;
-    delete body.approvalSettings;
-  }
+  if (body.approvalSettings) { config.approvalSettings = body.approvalSettings; delete body.approvalSettings; }
+  if (body.approvalRules) { config.approvalRules = body.approvalRules; delete body.approvalRules; }
+  if (body.reviewedTabs) { config.reviewedTabs = body.reviewedTabs; delete body.reviewedTabs; }
 
-  // If approvalRules sent separately, merge at top level
-  if (body.approvalRules) {
-    config.approvalRules = body.approvalRules;
-    delete body.approvalRules;
-  }
+  config.onboarding = { ...((config.onboarding as Record<string, unknown>) || {}), ...body };
 
-  // If reviewedTabs sent separately, merge at top level
-  if (body.reviewedTabs) {
-    config.reviewedTabs = body.reviewedTabs;
-    delete body.reviewedTabs;
-  }
+  DeploymentRepo.updateConfig(deploymentId, JSON.stringify(config));
 
-  // Merge onboarding data into config
-  config.onboarding = {
-    ...((config.onboarding as Record<string, unknown>) || {}),
-    ...body,
-  };
-
-  db.prepare("UPDATE deployments SET config = ? WHERE id = ?").run(
-    JSON.stringify(config),
-    deploymentId
-  );
-
-  // Log onboarding progress
-  try {
-    logActivity({
-      deploymentId,
-      userId: user.id,
-      type: "onboarding",
-      title: body.completed ? "Onboarding completed" : "Onboarding updated",
-      description: body.completed
-        ? "Agent onboarding has been completed"
-        : "Onboarding configuration was updated",
-      metadata: { completed: !!body.completed },
-      status: "success",
-    });
-  } catch {
-    // never break main flow
-  }
+  ActivityRepo.log({
+    deploymentId, userId: user.id, type: "onboarding",
+    title: body.completed ? "Onboarding completed" : "Onboarding updated",
+    description: body.completed ? "Agent onboarding has been completed" : "Onboarding configuration was updated",
+    metadata: { completed: !!body.completed },
+    status: "success",
+  });
 
   return NextResponse.json({ success: true, onboarding: config.onboarding });
 }

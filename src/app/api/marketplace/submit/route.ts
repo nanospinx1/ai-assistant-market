@@ -1,10 +1,11 @@
 // POST /api/marketplace/submit — Submit a custom agent to the global marketplace
-// GET /api/marketplace/submit — List user's submissions (optional ?employeeId= filter)
+// GET /api/marketplace/submit — List user's submissions
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
-import { createNotification } from "@/lib/notifications";
+import * as EmployeeRepo from "@/lib/repositories/employees";
+import * as NotificationRepo from "@/lib/repositories/notifications";
 
 export async function POST(req: NextRequest) {
   const { user, error } = await requireAuth();
@@ -19,16 +20,13 @@ export async function POST(req: NextRequest) {
 
   const db = getDb();
 
-  // Verify the employee exists and belongs to the user (custom employee)
+  // Verify the employee exists and belongs to the user
   const employee = db
     .prepare("SELECT * FROM ai_employees WHERE id = ? AND created_by = ?")
     .get(employeeId, user.id) as any;
 
   if (!employee) {
-    return NextResponse.json(
-      { error: "Employee not found or you don't have permission to submit it" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Employee not found or you don't have permission" }, { status: 404 });
   }
 
   // Check for existing submission
@@ -37,16 +35,11 @@ export async function POST(req: NextRequest) {
     .get(employeeId) as any;
 
   if (existing) {
-    return NextResponse.json(
-      { error: "This employee has already been published to the marketplace" },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "This employee has already been published to the marketplace" }, { status: 409 });
   }
 
-  // --- Server-side quality gate validation ---
+  // Quality gate validation
   const errors: string[] = [];
-
-  // Gate 1: Portfolio completeness
   if (!specialty || typeof specialty !== "string" || specialty.trim().length < 100) {
     errors.push("Specialty description must be at least 100 characters");
   }
@@ -69,56 +62,40 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Quality gates not met", details: errors }, { status: 422 });
   }
 
-  // Build portfolio data
   const portfolio = {
     specialty: specialty.trim(),
-    toolIntegrations: toolIntegrations.map((t: { name?: string; note?: string }) => ({
-      name: t.name || "",
-      note: t.note || "",
-    })),
+    toolIntegrations: toolIntegrations.map((t: any) => ({ name: t.name || "", note: t.note || "" })),
     bestFor: bestFor.filter((t: unknown) => typeof t === "string"),
-    useCases: useCases.map((uc: { title?: string; description?: string; outcome?: string }) => ({
-      title: uc.title || "",
-      description: uc.description || "",
-      outcome: uc.outcome || "",
-    })),
+    useCases: useCases.map((uc: any) => ({ title: uc.title || "", description: uc.description || "", outcome: uc.outcome || "" })),
   };
 
-  // Create sanitized snapshot — strip private data (system_prompt, custom_instructions, etc.)
   const snapshot = JSON.stringify({
-    id: employee.id,
-    name: employee.name,
-    role: employee.role,
-    description: employee.description,
-    category: employee.category,
+    id: employee.id, name: employee.name, role: employee.role,
+    description: employee.description, category: employee.category,
     capabilities: employee.capabilities,
-    price_monthly: employee.price_monthly,
-    price_yearly: employee.price_yearly,
+    price_monthly: employee.price_monthly, price_yearly: employee.price_yearly,
     agent_type: employee.agent_type,
     submitted_at: new Date().toISOString(),
     publisher: user.name || user.email,
     ...portfolio,
-    // NOTE: system_prompt, custom_instructions, default_tools, default_knowledge, API keys
-    // are intentionally excluded to protect the creator's private agent configuration
   });
 
   const submissionId = uuid();
 
-  // TODO: Replace auto-approve with admin review dashboard.
-  // Future flow: status starts as 'pending', admin reviews and sets 'approved'/'rejected'/'changes_requested'.
-  // For now, auto-approve all submissions that pass quality gates.
+  // Auto-approve for now (TODO: admin review dashboard)
   db.prepare(`
     INSERT INTO marketplace_submissions (id, employee_id, submitted_by, status, snapshot)
     VALUES (?, ?, ?, 'approved', ?)
   `).run(submissionId, employeeId, user.id, snapshot);
 
-  db.prepare(`
-    UPDATE ai_employees SET is_published = 1, publish_status = 'approved', publisher_name = ?
-    WHERE id = ?
-  `).run(user.name || user.email, employeeId);
+  EmployeeRepo.updatePublishStatus(employeeId, {
+    is_published: 1,
+    publish_status: "approved",
+  });
 
-  // Create notification for marketplace publish
-  createNotification({
+  db.prepare("UPDATE ai_employees SET publisher_name = ? WHERE id = ?").run(user.name || user.email, employeeId);
+
+  NotificationRepo.create({
     userId: user.id,
     type: "publish_update",
     title: "Agent published to marketplace",
@@ -139,23 +116,15 @@ export async function GET(req: NextRequest) {
   let submissions: unknown[];
   if (employeeIdFilter) {
     submissions = db
-      .prepare(
-        `SELECT ms.*, e.name as employee_name, e.role as employee_role
-         FROM marketplace_submissions ms
-         JOIN ai_employees e ON ms.employee_id = e.id
-         WHERE ms.submitted_by = ? AND ms.employee_id = ?
-         ORDER BY ms.submitted_at DESC`
-      )
+      .prepare(`SELECT ms.*, e.name as employee_name, e.role as employee_role
+         FROM marketplace_submissions ms JOIN ai_employees e ON ms.employee_id = e.id
+         WHERE ms.submitted_by = ? AND ms.employee_id = ? ORDER BY ms.submitted_at DESC`)
       .all(user.id, employeeIdFilter);
   } else {
     submissions = db
-      .prepare(
-        `SELECT ms.*, e.name as employee_name, e.role as employee_role
-         FROM marketplace_submissions ms
-         JOIN ai_employees e ON ms.employee_id = e.id
-         WHERE ms.submitted_by = ?
-         ORDER BY ms.submitted_at DESC`
-      )
+      .prepare(`SELECT ms.*, e.name as employee_name, e.role as employee_role
+         FROM marketplace_submissions ms JOIN ai_employees e ON ms.employee_id = e.id
+         WHERE ms.submitted_by = ? ORDER BY ms.submitted_at DESC`)
       .all(user.id);
   }
 

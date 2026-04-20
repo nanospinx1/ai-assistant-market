@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSession, initializeDb } from "@/lib/auth";
-import bcryptjs from "bcryptjs";
-import { v4 as uuid } from "uuid";
+import { createSession } from "@/lib/auth";
+import { seedDatabase } from "@/lib/seed";
+import * as UserRepo from "@/lib/repositories/users";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,17 +10,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name, email, and password are required" }, { status: 400 });
     }
 
-    const db = initializeDb();
-    const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+    seedDatabase();
+    const existing = UserRepo.findUserByEmail(email);
     if (existing) {
       return NextResponse.json({ error: "An account with this email already exists" }, { status: 409 });
     }
 
-    const id = uuid();
-    const hashedPassword = bcryptjs.hashSync(password, 10);
-    db.prepare("INSERT INTO users (id, email, name, password, company) VALUES (?, ?, ?, ?, ?)")
-      .run(id, email, name, hashedPassword, company || null);
-
+    const hashedPassword = UserRepo.hashPassword(password);
+    const id = require("uuid").v4();
+    UserRepo.createUser(id, email, name, hashedPassword, company);
     await createSession({ id, email, name, company });
 
     return NextResponse.json({

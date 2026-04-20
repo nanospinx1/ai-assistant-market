@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
-import { seedDatabase } from "@/lib/seed";
+import * as DeploymentRepo from "@/lib/repositories/deployments";
 
 const SECRET = new TextEncoder().encode(
   process.env.AUTH_SECRET || "dev-secret-change-in-production-ai-market-2026"
@@ -67,24 +66,15 @@ export async function requireAuth(): Promise<
 
 /**
  * Verify that a deployment belongs to the authenticated user.
- * Returns the deployment row or a 404 response.
+ * Uses the deployments repository.
  */
 export function verifyDeploymentOwnership(
   deploymentId: string,
   userId: string
 ): { deployment: any; error?: never } | { deployment?: never; error: NextResponse } {
-  const db = getDb();
-  const deployment = db
-    .prepare("SELECT * FROM deployments WHERE id = ? AND user_id = ?")
-    .get(deploymentId, userId) as any;
-
+  const deployment = DeploymentRepo.findByIdAndUser(deploymentId, userId);
   if (!deployment) {
     return { error: NextResponse.json({ error: "Deployment not found" }, { status: 404 }) };
   }
   return { deployment };
-}
-
-export function initializeDb() {
-  seedDatabase();
-  return getDb();
 }
