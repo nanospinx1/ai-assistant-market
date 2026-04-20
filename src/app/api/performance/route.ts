@@ -14,6 +14,7 @@ export async function GET() {
   const summary = db.prepare(`
     SELECT d.id as deployment_id, d.name as deployment_name, d.status,
       e.name as employee_name, e.avatar as employee_avatar, e.category as employee_category,
+      e.role as employee_role,
       ROUND(AVG(CASE WHEN pm.metric_type = 'tasks_completed' THEN pm.value END), 1) as avg_tasks,
       ROUND(AVG(CASE WHEN pm.metric_type = 'response_time' THEN pm.value END), 2) as avg_response_time,
       ROUND(AVG(CASE WHEN pm.metric_type = 'accuracy' THEN pm.value END), 1) as avg_accuracy,
@@ -23,6 +24,7 @@ export async function GET() {
     LEFT JOIN performance_metrics pm ON d.id = pm.deployment_id
     WHERE d.user_id = ?
     GROUP BY d.id
+    ORDER BY d.created_at DESC
   `).all(userId);
 
   const mapped = summary.map((s: any) => ({
@@ -34,6 +36,7 @@ export async function GET() {
     employeeName: s.employee_name,
     employeeAvatar: s.employee_avatar,
     employeeCategory: s.employee_category,
+    employeeRole: s.employee_role,
     avgTasks: s.avg_tasks,
     avgResponseTime: s.avg_response_time,
     avgAccuracy: s.avg_accuracy,

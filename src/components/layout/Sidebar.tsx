@@ -1,13 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth, useTheme } from "@/components/layout/Providers";
+import { useAIAssistantOptional } from "@/contexts/AIAssistantContext";
 import {
   LayoutDashboard,
   Store,
-  Rocket,
+  Users,
   BarChart3,
   Wrench,
   LogOut,
@@ -17,22 +18,63 @@ import {
   Sun,
   Moon,
   Plug,
+  Settings as SettingsIcon,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/marketplace", label: "Marketplace", icon: Store },
-  { href: "/deploy", label: "Deployments", icon: Rocket },
-  { href: "/performance", label: "Performance", icon: BarChart3 },
-  { href: "/custom-builder", label: "Custom Builder", icon: Wrench },
-  { href: "/integrations", label: "Integrations", icon: Plug },
+const navGroups = [
+  {
+    label: "MANAGE",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/deploy", label: "My Employees", icon: Users },
+      { href: "/approvals", label: "Approvals", icon: ShieldCheck },
+    ],
+  },
+  {
+    label: "HIRE",
+    items: [
+      { href: "/marketplace", label: "Marketplace", icon: Store },
+      { href: "/custom-builder", label: "Custom Builder", icon: Wrench },
+    ],
+  },
+  {
+    label: "MONITOR",
+    items: [
+      { href: "/performance", label: "Performance", icon: BarChart3 },
+      { href: "/integrations", label: "Resources", icon: Plug },
+    ],
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const aiAssistant = useAIAssistantOptional();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pendingApprovals, setPendingApprovals] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    async function fetchCount() {
+      try {
+        const res = await fetch("/api/approvals?status=pending&limit=100");
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          setPendingApprovals((data.approvals || []).length);
+        }
+      } catch {
+        // ignore
+      }
+    }
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [user]);
 
   if (!user) return null;
 
@@ -97,37 +139,76 @@ export default function Sidebar() {
           </Link>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "text-white shadow-lg"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]"
-                  }`}
-                  style={
-                    isActive
-                      ? {
-                          background: "linear-gradient(135deg, #4F46E5, #6366F1)",
-                          boxShadow: "0 4px 12px rgba(79, 70, 229, 0.25)",
+          <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+            {navGroups.map((group) => (
+              <div key={group.label}>
+                <p className="px-4 mb-2 text-[10px] font-semibold tracking-widest uppercase text-[var(--text-muted)]">
+                  {group.label}
+                </p>
+                <div className="space-y-1">
+                  {group.items.map((item) => {
+                    const isActive = pathname.startsWith(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          isActive
+                            ? "text-white shadow-lg"
+                            : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]"
+                        }`}
+                        style={
+                          isActive
+                            ? {
+                                background: "linear-gradient(135deg, #4F46E5, #6366F1)",
+                                boxShadow: "0 4px 12px rgba(79, 70, 229, 0.25)",
+                              }
+                            : undefined
                         }
-                      : undefined
-                  }
-                >
-                  <item.icon size={20} />
-                  {item.label}
-                </Link>
-              );
-            })}
+                      >
+                        <item.icon size={20} />
+                        <span className="flex-1">{item.label}</span>
+                        {item.href === "/approvals" && pendingApprovals > 0 && (
+                          <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-semibold">
+                            {pendingApprovals}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
+          {/* AI Assistant button */}
+          {aiAssistant && (
+            <div className="px-3 pb-2">
+              <button
+                onClick={aiAssistant.toggleAssistant}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.01] group relative"
+                style={{
+                  background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(79,70,229,0.1))",
+                  border: "1px solid rgba(124,58,237,0.25)",
+                }}
+              >
+                <div className="relative">
+                  <Sparkles size={20} className="text-purple-400" />
+                  {aiAssistant.shouldPulse && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full animate-pulse" />
+                  )}
+                </div>
+                <span className="text-purple-300 group-hover:text-purple-200 transition-colors">
+                  AI Assistant
+                </span>
+              </button>
+            </div>
+          )}
+
           {/* User section */}
-          <div className="px-3 py-4 border-t border-[var(--border)]">
+          <div className="px-3 py-4 border-t border-[var(--border)] space-y-2">
+            {/* User avatar card */}
             <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[var(--bg-surface)]">
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
@@ -145,24 +226,37 @@ export default function Sidebar() {
                   {user?.email}
                 </p>
               </div>
+              <NotificationBell />
             </div>
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-3 w-full pl-4 pr-4 py-2.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-xl transition-colors duration-200 hover:bg-[var(--bg-card-hover)]"
-            >
-              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              {theme === "dark" ? "Light Mode" : "Dark Mode"}
-            </button>
-            <button
-              onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST" });
-                window.location.href = "/";
-              }}
-              className="relative z-10 flex items-center gap-3 w-full pl-4 pr-4 py-2.5 mt-2 text-sm text-[var(--text-muted)] hover:text-[var(--danger)] rounded-xl transition-colors duration-200 hover:bg-red-500/5"
-            >
-              <LogOut size={18} />
-              Sign Out
-            </button>
+
+            {/* Settings, Theme toggle, Sign Out row */}
+            <div className="flex items-center justify-between px-2">
+              <Link
+                href="/settings"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 py-1"
+              >
+                <SettingsIcon size={16} />
+                Settings
+              </Link>
+              <button
+                onClick={toggleTheme}
+                className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-colors duration-200"
+                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+              <button
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  window.location.href = "/";
+                }}
+                className="relative z-10 flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--danger)] transition-colors duration-200 py-1"
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </aside>

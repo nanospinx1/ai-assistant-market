@@ -7,6 +7,7 @@ import { CRMTool } from "./crm-tool";
 import { CalendarTool } from "./calendar-tool";
 import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
+import { checkApprovalRequired, createApprovalRequest } from "@/lib/approval";
 
 // Registry of available tool handlers
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -72,6 +73,28 @@ export async function executeTool(
       output: null,
       error: `No handler found for function: ${functionName}`,
     };
+  }
+
+  // Human-in-the-Loop: check if this tool+action requires approval
+  if (userId && checkApprovalRequired(deploymentId, matchedHandler.type, functionName)) {
+    try {
+      const approvalId = createApprovalRequest({
+        deploymentId,
+        userId,
+        toolName: matchedHandler.type,
+        action: functionName,
+        title: `${matchedHandler.type}: ${functionName.replace(/_/g, " ")}`,
+        description: `Agent wants to execute ${functionName} via ${matchedHandler.type} tool.`,
+        payload: params,
+      });
+      return {
+        success: true,
+        output: `⏳ This action requires your approval. I've submitted a request (ID: ${approvalId}) — please review it in the Approvals page.`,
+      };
+    } catch (err) {
+      console.error("[tool-executor] Failed to create approval request:", err);
+      // Fall through to normal execution if approval creation fails
+    }
   }
 
   // Load user's tool connection for this tool type (if configured)

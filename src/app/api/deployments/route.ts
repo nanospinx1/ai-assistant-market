@@ -4,6 +4,8 @@ import { seedDatabase } from "@/lib/seed";
 import { requireAuth } from "@/lib/auth";
 import { recommendModel } from "@/lib/agents/model-recommender";
 import { seedDeploymentKnowledge } from "@/lib/agents/agent-registry";
+import { logActivity } from "@/lib/activity-logger";
+import { createNotification } from "@/lib/notifications";
 
 export async function GET() {
   const { user, error } = await requireAuth();
@@ -62,13 +64,42 @@ export async function POST(req: NextRequest) {
   });
 
   db.prepare(`
-    INSERT INTO deployments (id, user_id, employee_id, name, status, config, default_model, model_tier, deployed_at)
-    VALUES (?, ?, ?, ?, 'active', ?, ?, ?, datetime('now'))
+    INSERT INTO deployments (id, user_id, employee_id, name, status, config, default_model, model_tier)
+    VALUES (?, ?, ?, ?, 'configuring', ?, ?, ?)
   `).run(id, user.id, employee_id, name, JSON.stringify(config), recommendation.modelId, recommendation.tier);
 
   // Seed default knowledge sources for this agent type
   const agentType = employee?.agent_type || "generic";
   seedDeploymentKnowledge(id, agentType);
+
+  // Log deployment creation
+  try {
+    logActivity({
+      deploymentId: id,
+      userId: user.id,
+      type: "status_change",
+      title: "Deployment created",
+      description: `Deployed "${name}" with model ${recommendation.modelDisplayName}`,
+      metadata: {
+        employeeId: employee_id,
+        modelId: recommendation.modelId,
+        tier: recommendation.tier,
+      },
+      status: "success",
+    });
+  } catch {
+    // never break main flow
+  }
+
+  // Create notification for new deployment
+  createNotification({
+    userId: user.id,
+    deploymentId: id,
+    type: "task_complete",
+    title: "New agent deployed",
+    message: `"${name}" is live with model ${recommendation.modelDisplayName}`,
+    link: `/deploy/${id}`,
+  });
 
   return NextResponse.json({
     success: true,
@@ -98,6 +129,116 @@ export async function PATCH(req: NextRequest) {
     db.prepare("UPDATE deployments SET status = ?, deployed_at = datetime('now') WHERE id = ?").run(status, id);
   } else {
     db.prepare("UPDATE deployments SET status = ? WHERE id = ?").run(status, id);
+  }
+
+  // Log status change
+  try {
+    const labels: Record<string, string> = {
+      active: "resumed",
+      paused: "paused",
+      stopped: "stopped",
+      archived: "archived",
+    };
+    logActivity({
+      deploymentId: id,
+      userId: user.id,
+      type: "status_change",
+      title: `Deployment ${labels[status] || status}`,
+      description: `Status changed to ${status}`,
+      metadata: { previousStatus: (dep as any).status, newStatus: status },
+      status: "success",
+    });
+  } catch {
+    // never break main flow
+  }
+
+  // Create notification for status change
+  const statusLabels: Record<string, string> = {
+    active: "resumed",
+    paused: "paused",
+    stopped: "stopped",
+    archived: "archived",
+  };
+  createNotification({
+    userId: user.id,
+    deploymentId: id,
+    type: "status_change",
+    title: `Agent ${statusLabels[status] || status}`,
+    message: `Deployment status changed to ${status}`,
+    link: `/deploy/${id}`,
+  });
+
+  return NextResponse.json({ success: true });
+}
+
+export async function DELETE(req: NextRequest) {
+  const { user, error } = await requireAuth();
+  if (error) return error;
+
+  const body = await req.json();
+  const db = getDb();
+  const { id } = body;
+
+  const dep = db.prepare("SELECT * FROM deployments WHERE id = ? AND user_id = ?").get(id, user.id) as any;
+  if (!dep) return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+
+  // Log activity BEFORE deleting so it persists
+  try {
+    logActivity({
+      deploymentId: id,
+      userId: user.id,
+      type: "status_change",
+      title: `Employee "${dep.name}" deleted`,
+      description: `Permanently removed from workforce`,
+      metadata: { deletedName: dep.name },
+      status: "success",
+    });
+  } catch {
+    // never break main flow
+  }
+
+  try {
+    // FK pragma must be set OUTSIDE the transaction in SQLite
+    db.pragma("foreign_keys = OFF");
+    const deleteAll = db.transaction(() => {
+      const tables = [
+        "conversations",
+        "messages",
+        "performance_metrics",
+        "knowledge_sources",
+        "notifications",
+        "scheduled_tasks",
+        "task_runs",
+        "task_logs",
+        "usage_logs",
+        "deployment_tool_bindings",
+        "tool_execution_logs",
+      ];
+      for (const table of tables) {
+        try {
+          db.prepare(`DELETE FROM ${table} WHERE deployment_id = ?`).run(id);
+        } catch {
+          // table may not exist or column name differs — skip
+        }
+      }
+      db.prepare("DELETE FROM deployments WHERE id = ?").run(id);
+    });
+    deleteAll();
+    db.pragma("foreign_keys = ON");
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || "Failed to delete" }, { status: 500 });
+  }
+
+  try {
+    createNotification({
+      userId: user.id,
+      type: "status_change",
+      title: "Employee deleted",
+      message: `"${dep.name}" has been permanently deleted`,
+      link: "/deploy",
+    });
+  } catch {
+    // never break main flow
   }
 
   return NextResponse.json({ success: true });

@@ -13,6 +13,7 @@ import {
   Loader2,
   Clock,
   Zap,
+  FlaskConical,
 } from "lucide-react";
 
 interface Message {
@@ -112,6 +113,7 @@ export default function ChatPage() {
         body: JSON.stringify({
           message: userMessage.content,
           conversationId: activeConversationId,
+          sandbox: true,
         }),
       });
 
@@ -153,8 +155,8 @@ export default function ChatPage() {
     return (
       <div className="p-6">
         <p className="text-[var(--text-secondary)]">Deployment not found.</p>
-        <button onClick={() => router.push("/deploy")} className="mt-4 text-[var(--primary)] hover:underline">
-          ← Back to Deployments
+        <button onClick={() => router.push(`/deploy/${deploymentId}/workspace`)} className="mt-4 text-[var(--primary)] hover:underline">
+          ← Back to Workspace
         </button>
       </div>
     );
@@ -166,10 +168,10 @@ export default function ChatPage() {
       <div className="w-72 flex-shrink-0 bg-[var(--bg-card)] rounded-xl border border-[var(--border)] flex flex-col">
         <div className="p-4 border-b border-[var(--border)]">
           <button
-            onClick={() => router.push("/deploy")}
+            onClick={() => router.push(`/deploy/${deploymentId}/workspace`)}
             className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--primary)] mb-3 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Deployments
+            <ArrowLeft className="w-4 h-4" /> Back to Workspace
           </button>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
             {deployment.employeeRole}
@@ -225,7 +227,7 @@ export default function ChatPage() {
                 {deployment.employeeRole}
               </h3>
               <p className="text-xs text-[var(--text-muted)]">
-                {deployment.status === "active" ? "🟢 Online" : "⚪ Inactive"}
+                {deployment.status === "active" ? "🟢 Online" : "⚪ Inactive"} · Sandbox
               </p>
             </div>
           </div>
@@ -243,6 +245,14 @@ export default function ChatPage() {
           )}
         </div>
 
+        {/* Sandbox banner */}
+        <div className="px-6 py-2.5 border-b border-[var(--border)] flex items-center gap-2.5" style={{ background: "rgba(99,102,241,0.06)" }}>
+          <FlaskConical className="w-4 h-4 text-indigo-400 shrink-0" />
+          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+            <strong className="text-[var(--text-primary)]">Sandbox</strong> — This is a test conversation. It does not interrupt the agent&apos;s live operations and won&apos;t appear in production activity logs.
+          </p>
+        </div>
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {messages.length === 0 && (
@@ -251,11 +261,11 @@ export default function ChatPage() {
                 <Bot className="w-8 h-8 text-[var(--primary)]" />
               </div>
               <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
-                Chat with {deployment.employeeRole}
+                Test Chat with {deployment.employeeRole}
               </h3>
               <p className="text-sm text-[var(--text-muted)] max-w-md">
-                Start a conversation with your AI employee. They&apos;re ready to help with{" "}
-                {deployment.employeeCategory?.toLowerCase() || "your tasks"}.
+                Start a sandbox conversation to test your AI employee&apos;s responses. This won&apos;t interfere with their live work
+                in {deployment.employeeCategory?.toLowerCase() || "your tasks"}.
               </p>
             </div>
           )}

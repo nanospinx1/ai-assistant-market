@@ -363,7 +363,7 @@ export default function PublishPortfolioPage() {
           href="/deploy"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20"
         >
-          Back to Deployments
+          Back to My Employees
         </Link>
       </div>
     );
@@ -385,7 +385,7 @@ export default function PublishPortfolioPage() {
           href="/deploy"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/20"
         >
-          Back to Deployments
+          Back to My Employees
         </Link>
       </div>
     );
@@ -404,7 +404,7 @@ export default function PublishPortfolioPage() {
           href="/deploy"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600"
         >
-          <ArrowLeft size={16} /> Back to Deployments
+          <ArrowLeft size={16} /> Back to My Employees
         </Link>
       </div>
     );
@@ -425,7 +425,7 @@ export default function PublishPortfolioPage() {
         style={{ color: "var(--text-secondary)" }}
       >
         <ArrowLeft size={16} />
-        Back to Deployments
+        Back to My Employees
       </Link>
 
       <div className="mb-8">

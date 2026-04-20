@@ -96,6 +96,7 @@ interface DeployConfig {
   tools: string[];
   dataSources: string[];
   schedule: string;
+  approvalSettings: { email: boolean; crm: boolean; calendar: boolean };
 }
 
 interface ModelRecommendation {
@@ -127,6 +128,7 @@ export default function DeployConfigPage() {
   const [step, setStep] = useState(0);
   const [deploying, setDeploying] = useState(false);
   const [deployed, setDeployed] = useState(false);
+  const [celebrationDone, setCelebrationDone] = useState(false);
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [progress, setProgress] = useState(0);
   const [recommendation, setRecommendation] = useState<ModelRecommendation | null>(null);
@@ -138,6 +140,7 @@ export default function DeployConfigPage() {
     tools: [],
     dataSources: [],
     schedule: "24/7 Always On",
+    approvalSettings: { email: true, crm: false, calendar: true },
   });
 
   useEffect(() => {
@@ -209,6 +212,7 @@ export default function DeployConfigPage() {
             tools: config.tools,
             dataSources: config.dataSources,
             schedule: config.schedule,
+            approvalSettings: config.approvalSettings,
           },
         }),
       });
@@ -220,6 +224,7 @@ export default function DeployConfigPage() {
       clearInterval(interval);
       setProgress(100);
       setTimeout(() => setDeployed(true), 600);
+      setTimeout(() => setCelebrationDone(true), 4500);
     } catch {
       clearInterval(interval);
     } finally {
@@ -443,6 +448,50 @@ export default function DeployConfigPage() {
                 })}
               </div>
             </div>
+
+            {/* Approval Settings */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-[#94A3B8] flex items-center gap-2">
+                <Shield size={16} className="text-amber-400" />
+                Approval Settings
+              </label>
+              <p className="text-xs text-[#64748B]">
+                Require human approval before the agent performs high-stakes actions.
+              </p>
+              <div className="space-y-3">
+                {([
+                  { key: "email" as const, label: "Require approval before sending emails", icon: Mail },
+                  { key: "crm" as const, label: "Require approval before updating CRM records", icon: Database },
+                  { key: "calendar" as const, label: "Require approval before scheduling meetings", icon: Calendar },
+                ] as const).map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() =>
+                      setConfig((c) => ({
+                        ...c,
+                        approvalSettings: { ...c.approvalSettings, [item.key]: !c.approvalSettings[item.key] },
+                      }))
+                    }
+                    className="flex items-center gap-3 w-full p-4 rounded-xl text-left transition-all duration-200 border bg-[#0B1120] border-[#1E293B] hover:border-[#334155]"
+                  >
+                    <item.icon size={18} className="text-[#64748B] shrink-0" />
+                    <span className="flex-1 text-sm text-[#94A3B8]">{item.label}</span>
+                    <div
+                      className={`w-10 h-6 rounded-full relative transition-colors duration-200 ${
+                        config.approvalSettings[item.key] ? "bg-amber-500" : "bg-[#1E293B]"
+                      }`}
+                    >
+                      <div
+                        className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all duration-200 ${
+                          config.approvalSettings[item.key] ? "left-5" : "left-1"
+                        }`}
+                      />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -465,6 +514,14 @@ export default function DeployConfigPage() {
                 { label: "Tools", value: config.tools.join(", ") },
                 { label: "Data Sources", value: config.dataSources.join(", ") },
                 { label: "Schedule", value: config.schedule },
+                {
+                  label: "Approval Required",
+                  value: [
+                    config.approvalSettings.email && "Email",
+                    config.approvalSettings.crm && "CRM",
+                    config.approvalSettings.calendar && "Calendar",
+                  ].filter(Boolean).join(", ") || "None",
+                },
               ].map((row) => (
                 <div key={row.label} className="flex justify-between items-start p-4">
                   <span className="text-sm font-medium text-[#94A3B8]">
@@ -542,7 +599,7 @@ export default function DeployConfigPage() {
           <div className="text-center space-y-6 py-8">
             {deployed ? (
               <>
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30 animate-bounce">
+                <div className={`w-24 h-24 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30 transition-transform duration-700 ${celebrationDone ? "" : "animate-bounce"}`}>
                   <Check size={44} className="text-white" />
                 </div>
                 <h2 className="text-2xl font-bold text-[#F1F5F9]">
@@ -564,8 +621,8 @@ export default function DeployConfigPage() {
                   {["bg-emerald-400", "bg-indigo-400", "bg-amber-400", "bg-pink-400", "bg-cyan-400"].map((c, i) => (
                     <div
                       key={i}
-                      className={`w-2 h-2 rounded-full ${c} animate-ping`}
-                      style={{ animationDelay: `${i * 0.15}s`, animationDuration: "1.5s" }}
+                      className={`w-2 h-2 rounded-full ${c} transition-opacity duration-700 ${celebrationDone ? "opacity-60" : "animate-ping"}`}
+                      style={celebrationDone ? {} : { animationDelay: `${i * 0.15}s`, animationDuration: "1.5s" }}
                     />
                   ))}
                 </div>

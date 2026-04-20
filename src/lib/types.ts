@@ -21,7 +21,7 @@ export interface Deployment {
   user_id: string;
   employee_id: string;
   name: string;
-  status: "configuring" | "deploying" | "active" | "paused" | "stopped";
+  status: "configuring" | "deploying" | "active" | "paused" | "archived";
   config: DeploymentConfig;
   deployed_at?: string;
   created_at: string;

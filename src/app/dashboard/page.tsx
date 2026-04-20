@@ -11,7 +11,6 @@ import {
   DollarSign,
   TrendingUp,
   ArrowRight,
-  Activity,
   Plus,
   Headphones,
   Calculator,
@@ -23,6 +22,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import ActivityFeed from "@/components/ActivityFeed";
 
 /* ── Category → Icon + gradient mapping ── */
 const categoryIconMap: Record<string, { icon: LucideIcon; gradient: string }> = {
@@ -59,7 +59,7 @@ interface Deployment {
   employeeRole: string;
   employeeAvatar: string;
   employeeCategory: string;
-  status: "active" | "paused" | "stopped";
+  status: "active" | "paused" | "archived";
   accuracy: number;
   tasksCompleted: number;
   uptime: string;
@@ -71,14 +71,6 @@ interface PerformanceData {
   avgAccuracy: number;
   monthlySpend: number;
 }
-
-/* ── Static data ── */
-const recentActivity = [
-  { id: 1, action: "Deployed", target: "Customer Support Agent", time: "2 hours ago", icon: Rocket, dotColor: "#10B981" },
-  { id: 2, action: "Updated config for", target: "Data Analyst Pro", time: "5 hours ago", icon: Activity, dotColor: "#3B82F6" },
-  { id: 3, action: "Hired", target: "Content Writer AI", time: "1 day ago", icon: Plus, dotColor: "#8B5CF6" },
-  { id: 4, action: "Performance review for", target: "Code Reviewer Bot", time: "2 days ago", icon: TrendingUp, dotColor: "#F59E0B" },
-];
 
 /* ── Loading skeleton with shimmer ── */
 function LoadingSkeleton() {
@@ -145,7 +137,9 @@ export default function DashboardPage() {
           const deps = await deploymentsRes.json();
           const perf = await performanceRes.json();
 
-          const enriched = (deps.deployments ?? deps).map((d: any) => {
+          const enriched = (deps.deployments ?? deps)
+            .filter((d: any) => d.status !== "archived")
+            .map((d: any) => {
             const p = perf.find?.((p: any) => (p.deploymentId || p.deployment_id) === d.id);
             return {
               ...d,
@@ -172,7 +166,8 @@ export default function DashboardPage() {
         } else {
           if (deploymentsRes.ok) {
             const data = await deploymentsRes.json();
-            setDeployments(data.deployments ?? data);
+            const all = data.deployments ?? data;
+            setDeployments(all.filter((d: any) => d.status !== "archived"));
           }
         }
       } catch {
@@ -317,9 +312,10 @@ export default function DashboardPage() {
                 const { icon: CategoryIcon, gradient } = getCategoryVisual(dep.employeeCategory || "", dep.employeeRole);
                 const gradientColor = gradient.match(/#[A-Fa-f0-9]{6}/)?.[0] ?? "#4F46E5";
                 return (
-                  <div
+                  <Link
                     key={dep.id}
-                    className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--border)] card-hover cursor-pointer transition-all duration-200"
+                    href={`/deploy/${dep.id}/workspace`}
+                    className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--border)] card-hover cursor-pointer transition-all duration-200 block"
                     style={{
                       background: "var(--bg-card)",
                       borderLeft: `3px solid ${gradientColor}`,
@@ -365,7 +361,7 @@ export default function DashboardPage() {
                         <p className="text-xs text-[var(--text-muted)]">Uptime</p>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -434,31 +430,7 @@ export default function DashboardPage() {
             style={{ background: "var(--bg-card)" }}
           >
             <h3 className="text-base font-semibold mb-4 text-[var(--text-primary)]">Recent Activity</h3>
-            <div className="space-y-4">
-              {recentActivity.map((item) => (
-                <div key={item.id} className="flex items-start gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: "rgba(79, 70, 229, 0.12)" }}
-                  >
-                    <item.icon size={14} className="text-[var(--primary-light)]" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-2 h-2 rounded-full shrink-0 mt-0.5"
-                        style={{ background: item.dotColor }}
-                      />
-                      <p className="text-sm text-[var(--text-primary)]">
-                        {item.action}{" "}
-                        <span className="font-semibold">{item.target}</span>
-                      </p>
-                    </div>
-                    <p className="text-[10px] text-[var(--text-muted)] ml-4 mt-0.5">{item.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ActivityFeed compact limit={10} />
           </div>
         </div>
       </div>

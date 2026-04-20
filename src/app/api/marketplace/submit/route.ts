@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(req: NextRequest) {
   const { user, error } = await requireAuth();
@@ -115,6 +116,15 @@ export async function POST(req: NextRequest) {
     UPDATE ai_employees SET is_published = 1, publish_status = 'approved', publisher_name = ?
     WHERE id = ?
   `).run(user.name || user.email, employeeId);
+
+  // Create notification for marketplace publish
+  createNotification({
+    userId: user.id,
+    type: "publish_update",
+    title: "Agent published to marketplace",
+    message: `"${employee.name}" is now live on the marketplace`,
+    link: "/marketplace",
+  });
 
   return NextResponse.json({ success: true, id: submissionId, status: "approved" });
 }

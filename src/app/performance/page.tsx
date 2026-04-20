@@ -3,12 +3,15 @@
 import { useAuth } from "@/components/layout/Providers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
+
 import {
   BarChart3,
   TrendingUp,
   Clock,
   Target,
   Activity,
+  Archive,
   Zap,
   ChevronDown,
   ChevronUp,
@@ -19,6 +22,7 @@ import {
   Monitor,
   Settings,
   Rocket,
+  ExternalLink,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -66,6 +70,7 @@ interface DeploymentPerformance {
   name: string;
   employeeName?: string;
   employeeCategory?: string;
+  employeeRole?: string;
   status: string;
   avgTasks: number;
   avgResponseTime: number;
@@ -137,6 +142,117 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
+function PerformanceRow({ dep, expanded, onExpand, chartLoading, chartData }: {
+  dep: DeploymentPerformance;
+  expanded: string | null;
+  onExpand: (id: string) => void;
+  chartLoading: boolean;
+  chartData: ChartPoint[];
+}) {
+  return (
+    <div>
+      <button
+        onClick={() => onExpand(dep.id)}
+        className="w-full rounded-xl p-5 flex items-center gap-5 transition-all duration-200 text-left"
+        style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}
+      >
+        <CategoryIcon category={dep.employeeCategory} size="sm" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
+              {dep.name}
+            </p>
+            {dep.status === "archived" && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: "var(--bg-hover)", color: "var(--text-muted)" }}>
+                Archived
+              </span>
+            )}
+          </div>
+          {(dep.employeeRole || dep.employeeName) && (
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+              {dep.employeeRole || dep.employeeName}
+              {dep.employeeCategory && (
+                <span> · {dep.employeeCategory}</span>
+              )}
+            </p>
+          )}
+        </div>
+        <div className="hidden sm:flex items-center gap-8 text-sm">
+          <div className="text-center min-w-[60px]">
+            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgTasks}</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Tasks/day</p>
+          </div>
+          <div className="text-center min-w-[70px]">
+            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgResponseTime}</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Resp. Time</p>
+          </div>
+          <div className="text-center min-w-[60px]">
+            <p className={`font-semibold ${colorForPercent(dep.avgAccuracy)}`}>
+              {dep.avgAccuracy}%
+            </p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Accuracy</p>
+          </div>
+          <div className="text-center min-w-[60px]">
+            <p className={`font-semibold ${colorForPercent(dep.avgUptime)}`}>
+              {dep.avgUptime}%
+            </p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Uptime</p>
+          </div>
+        </div>
+        <div style={{ color: "var(--text-muted)" }}>
+          {expanded === dep.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </div>
+      </button>
+      {expanded === dep.id && (
+        <div className="rounded-b-xl p-6 -mt-1 border border-t-0" style={{ background: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+          <div className="flex items-center justify-end mb-3">
+            <Link
+              href={`/deploy/${dep.id}/workspace`}
+              className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+              style={{ color: "var(--primary)" }}
+            >
+              Open Workspace <ExternalLink size={14} />
+            </Link>
+          </div>
+          {chartLoading ? (
+            <div className="flex items-center justify-center h-48">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500" />
+            </div>
+          ) : chartData.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="gradTasks" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#4F46E5" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#4F46E5" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gradAccuracy" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                  <XAxis dataKey="date" stroke="#64748B" fontSize={12} />
+                  <YAxis stroke="#64748B" fontSize={12} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="tasks" stroke="#4F46E5" strokeWidth={2} fill="url(#gradTasks)" name="Tasks" />
+                  <Area type="monotone" dataKey="accuracy" stroke="#10B981" strokeWidth={2} fill="url(#gradAccuracy)" name="Accuracy %" />
+                  <Line type="monotone" dataKey="responseTime" stroke="#F59E0B" strokeWidth={2} dot={false} name="Resp Time (ms)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-center py-8" style={{ color: "var(--text-muted)" }}>
+              No chart data available for this deployment.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PerformancePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -162,11 +278,13 @@ export default function PerformancePage() {
         // API returns flat array of deployment performance objects
         const deps: DeploymentPerformance[] = Array.isArray(data) ? data : (data.deployments ?? []);
         setDeployments(deps);
-        if (deps.length > 0) {
-          const totalTasks = deps.reduce((s, d) => s + (d.avgTasks || 0), 0);
-          const avgResponse = deps.reduce((s, d) => s + (d.avgResponseTime || 0), 0) / deps.length;
-          const avgAccuracy = deps.reduce((s, d) => s + (d.avgAccuracy || 0), 0) / deps.length;
-          const avgUptime = deps.reduce((s, d) => s + (d.avgUptime || 0), 0) / deps.length;
+        // Summary stats from active workforce only
+        const activeDeps = deps.filter(d => d.status !== "archived");
+        if (activeDeps.length > 0) {
+          const totalTasks = activeDeps.reduce((s, d) => s + (d.avgTasks || 0), 0);
+          const avgResponse = activeDeps.reduce((s, d) => s + (d.avgResponseTime || 0), 0) / activeDeps.length;
+          const avgAccuracy = activeDeps.reduce((s, d) => s + (d.avgAccuracy || 0), 0) / activeDeps.length;
+          const avgUptime = activeDeps.reduce((s, d) => s + (d.avgUptime || 0), 0) / activeDeps.length;
           setSummary({ totalTasksCompleted: Math.round(totalTasks), avgResponseTime: +avgResponse.toFixed(1), overallAccuracy: +avgAccuracy.toFixed(1), overallUptime: +avgUptime.toFixed(1) });
         }
       }
@@ -277,131 +395,52 @@ export default function PerformancePage() {
       {/* Per-deployment Performance */}
       <div>
         <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
-          Performance by Employee
+          Active Workforce Performance
         </h2>
 
-        {deployments.length === 0 ? (
-          <div className="rounded-2xl p-10 text-center" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
-              <Zap size={28} className="text-white" />
-            </div>
-            <p style={{ color: "var(--text-secondary)" }}>
-              No deployment performance data available yet.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {deployments.map((dep) => (
-              <div key={dep.id}>
-                <button
-                  onClick={() => handleExpand(dep.id)}
-                  className="w-full rounded-xl p-5 flex items-center gap-5 transition-all duration-200 text-left"
-                  style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}
-                >
-                  <CategoryIcon category={dep.employeeCategory} size="sm" />
+        {(() => {
+          const activeDeps = deployments.filter(d => d.status !== "archived");
+          const archivedDeps = deployments.filter(d => d.status === "archived");
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
-                      {dep.name}
-                    </p>
-                    {dep.employeeName && (
-                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>{dep.employeeName}</p>
-                    )}
+          return (
+            <>
+              {activeDeps.length === 0 ? (
+                <div className="rounded-2xl p-10 text-center" style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)" }}>
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
+                    <Zap size={28} className="text-white" />
                   </div>
+                  <p style={{ color: "var(--text-secondary)" }}>
+                    No active deployment performance data available yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {activeDeps.map((dep) => (
+                    <PerformanceRow key={dep.id} dep={dep} expanded={expanded} onExpand={handleExpand} chartLoading={chartLoading} chartData={chartData} />
+                  ))}
+                </div>
+              )}
 
-                  {/* Metric columns */}
-                  <div className="hidden sm:flex items-center gap-8 text-sm">
-                    <div className="text-center min-w-[60px]">
-                      <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgTasks}</p>
-                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Tasks/day</p>
-                    </div>
-                    <div className="text-center min-w-[70px]">
-                      <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgResponseTime}</p>
-                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Resp. Time</p>
-                    </div>
-                    <div className="text-center min-w-[60px]">
-                      <p className={`font-semibold ${colorForPercent(dep.avgAccuracy)}`}>
-                        {dep.avgAccuracy}%
-                      </p>
-                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Accuracy</p>
-                    </div>
-                    <div className="text-center min-w-[60px]">
-                      <p className={`font-semibold ${colorForPercent(dep.avgUptime)}`}>
-                        {dep.avgUptime}%
-                      </p>
-                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Uptime</p>
-                    </div>
+              {archivedDeps.length > 0 && (
+                <div className="mt-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Archive size={18} style={{ color: "var(--text-muted)" }} />
+                    <h2 className="text-lg font-semibold" style={{ color: "var(--text-muted)" }}>
+                      Archived Employees — Historical Performance
+                    </h2>
                   </div>
-
-                  <div style={{ color: "var(--text-muted)" }}>
-                    {expanded === dep.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  <div className="space-y-3 opacity-60">
+                    {archivedDeps.map((dep) => (
+                      <PerformanceRow key={dep.id} dep={dep} expanded={expanded} onExpand={handleExpand} chartLoading={chartLoading} chartData={chartData} />
+                    ))}
                   </div>
-                </button>
-
-                {/* Expanded Chart */}
-                {expanded === dep.id && (
-                  <div className="rounded-b-xl p-6 -mt-1 border border-t-0" style={{ background: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
-                    {chartLoading ? (
-                      <div className="flex items-center justify-center h-48">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500" />
-                      </div>
-                    ) : chartData.length > 0 ? (
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData}>
-                            <defs>
-                              <linearGradient id="gradTasks" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#4F46E5" stopOpacity={0.3} />
-                                <stop offset="100%" stopColor="#4F46E5" stopOpacity={0} />
-                              </linearGradient>
-                              <linearGradient id="gradAccuracy" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} />
-                                <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                            <XAxis dataKey="date" stroke="#64748B" fontSize={12} />
-                            <YAxis stroke="#64748B" fontSize={12} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Area
-                              type="monotone"
-                              dataKey="tasks"
-                              stroke="#4F46E5"
-                              strokeWidth={2}
-                              fill="url(#gradTasks)"
-                              name="Tasks"
-                            />
-                            <Area
-                              type="monotone"
-                              dataKey="accuracy"
-                              stroke="#10B981"
-                              strokeWidth={2}
-                              fill="url(#gradAccuracy)"
-                              name="Accuracy %"
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="responseTime"
-                              stroke="#F59E0B"
-                              strokeWidth={2}
-                              dot={false}
-                              name="Resp Time (ms)"
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-                    ) : (
-                      <p className="text-center py-8" style={{ color: "var(--text-muted)" }}>
-                        No chart data available for this deployment.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
+
     </div>
   );
 }
