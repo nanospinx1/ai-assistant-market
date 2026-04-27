@@ -42,6 +42,7 @@ const featuredEmployees = [
     icon: Headphones,
     gradient: "from-blue-500 to-cyan-500",
     stripGradient: "from-blue-500 to-cyan-500",
+    slug: "emp-customer-support",
   },
   {
     name: "Alex",
@@ -52,6 +53,7 @@ const featuredEmployees = [
     icon: TrendingUp,
     gradient: "from-emerald-500 to-teal-500",
     stripGradient: "from-emerald-500 to-teal-500",
+    slug: "emp-sales-assistant",
   },
   {
     name: "Maya",
@@ -62,6 +64,7 @@ const featuredEmployees = [
     icon: Palette,
     gradient: "from-pink-500 to-rose-500",
     stripGradient: "from-pink-500 to-rose-500",
+    slug: "emp-content-writer",
   },
   {
     name: "James",
@@ -72,6 +75,7 @@ const featuredEmployees = [
     icon: Calculator,
     gradient: "from-amber-500 to-orange-500",
     stripGradient: "from-amber-500 to-orange-500",
+    slug: "emp-bookkeeper",
   },
 ];
 
@@ -409,7 +413,7 @@ export default function Home() {
                 <div
                   className="rounded-lg border p-3"
                   style={{
-                    background: "rgba(17,24,39,0.5)",
+                    background: "var(--bg-surface)",
                     borderColor: "var(--border)",
                   }}
                 >
@@ -572,8 +576,9 @@ export default function Home() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {featuredEmployees.map((emp) => (
-              <div
+              <Link
                 key={emp.name}
+                href={`/marketplace/${emp.slug}`}
                 className="card-hover group overflow-hidden rounded-2xl"
                 style={{ background: "var(--bg-card)" }}
               >
@@ -651,12 +656,12 @@ export default function Home() {
                     />
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
 
             {/* Custom Agent Build Card */}
             <Link
-              href="/marketplace"
+              href="/auth/signup"
               className="card-hover group relative overflow-hidden rounded-2xl flex flex-col items-center justify-center text-center"
               style={{ background: "var(--bg-card)", border: "2px dashed var(--border-light)" }}
             >
