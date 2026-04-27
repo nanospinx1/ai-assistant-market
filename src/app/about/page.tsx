@@ -385,65 +385,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ─── Team ─── */}
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-14">
-            <h2
-              className="mb-4 text-3xl font-bold md:text-4xl"
-              style={{ color: "var(--text-primary)" }}
-            >
-              Meet the Team
-            </h2>
-            <p
-              className="mx-auto max-w-2xl text-lg"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              The people building the future of AI-powered work.
-            </p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {team.map((member) => (
-              <div
-                key={member.name}
-                className="group rounded-2xl border p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg"
-                style={{
-                  borderColor: "var(--border)",
-                  background: "var(--bg-card)",
-                }}
-              >
-                <div
-                  className={`mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${member.color}`}
-                >
-                  <span className="text-2xl font-bold text-white">
-                    {member.initials}
-                  </span>
-                </div>
-                <h3
-                  className="mb-1 text-lg font-bold"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {member.name}
-                </h3>
-                <p
-                  className="mb-3 text-sm font-medium"
-                  style={{ color: "var(--accent)" }}
-                >
-                  {member.role}
-                </p>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  {member.bio}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ─── By the Numbers ─── */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">

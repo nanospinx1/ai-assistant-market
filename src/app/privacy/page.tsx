@@ -439,10 +439,10 @@ export default function PrivacyPolicy() {
                       </li>
                     </ul>
                     <p>
-                      To exercise any of these rights, please contact us at{" "}
-                      <a href="mailto:privacy@nanospinx.com" className="underline" style={{ color: "var(--text-primary)" }}>
-                        privacy@nanospinx.com
-                      </a>
+                      To exercise any of these rights, please{" "}
+                      <Link href="/contact" className="underline" style={{ color: "var(--text-primary)" }}>
+                        contact us
+                      </Link>
                       . We will respond to your request within 30 days.
                     </p>
                   </div>
@@ -495,9 +495,9 @@ export default function PrivacyPolicy() {
                       collected data from a child under 16, we will take immediate steps to delete that information from
                       our systems. If you believe we may have collected information from a child under 16, please
                       contact us at{" "}
-                      <a href="mailto:privacy@nanospinx.com" className="underline" style={{ color: "var(--text-primary)" }}>
-                        privacy@nanospinx.com
-                      </a>
+                      <Link href="/contact" className="underline" style={{ color: "var(--text-primary)" }}>
+                        our contact page
+                      </Link>
                       .
                     </p>
                   </div>
@@ -559,10 +559,9 @@ export default function PrivacyPolicy() {
                         AI Market — Privacy Team
                       </p>
                       <p>
-                        Email:{" "}
-                        <a href="mailto:privacy@nanospinx.com" className="underline" style={{ color: "var(--text-primary)" }}>
-                          privacy@nanospinx.com
-                        </a>
+                        <Link href="/contact" className="underline" style={{ color: "var(--text-primary)" }}>
+                          Contact our Privacy Team
+                        </Link>
                       </p>
                       <p>San Francisco, CA</p>
                     </div>

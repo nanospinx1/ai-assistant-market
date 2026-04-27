@@ -203,10 +203,10 @@ export default function TermsOfService() {
                       </li>
                     </ul>
                     <p>
-                      You must notify us immediately at{" "}
-                      <a href="mailto:legal@nanospinx.com" className="underline" style={{ color: "var(--text-primary)" }}>
-                        legal@nanospinx.com
-                      </a>{" "}
+                      You must notify us immediately via our{" "}
+                      <Link href="/contact" className="underline" style={{ color: "var(--text-primary)" }}>
+                        contact page
+                      </Link>{" "}
                       if you suspect any unauthorized use of your account or any other breach of security.
                     </p>
                   </div>
@@ -501,10 +501,10 @@ export default function TermsOfService() {
                     </p>
                     <p>
                       In the event of any dispute arising out of or relating to these Terms or your use of the Service,
-                      you agree to first attempt to resolve the dispute informally by contacting us at{" "}
-                      <a href="mailto:legal@nanospinx.com" className="underline" style={{ color: "var(--text-primary)" }}>
-                        legal@nanospinx.com
-                      </a>
+                      you agree to first attempt to resolve the dispute informally by{" "}
+                      <Link href="/contact" className="underline" style={{ color: "var(--text-primary)" }}>
+                        contacting us
+                      </Link>
                       . We will make good-faith efforts to resolve the dispute within 30 days.
                     </p>
                     <p>
@@ -555,10 +555,9 @@ export default function TermsOfService() {
                         AI Market — Legal Team
                       </p>
                       <p>
-                        Email:{" "}
-                        <a href="mailto:legal@nanospinx.com" className="underline" style={{ color: "var(--text-primary)" }}>
-                          legal@nanospinx.com
-                        </a>
+                        <Link href="/contact" className="underline" style={{ color: "var(--text-primary)" }}>
+                          Contact our Legal Team
+                        </Link>
                       </p>
                       <p>San Francisco, CA</p>
                     </div>

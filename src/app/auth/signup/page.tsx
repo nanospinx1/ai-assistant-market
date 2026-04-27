@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bot, Mail, Lock, User, Building2, ArrowRight, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Bot, Mail, Lock, User, Building2, ArrowRight, ArrowLeft, CheckCircle, Eye, EyeOff, Shield, Sparkles } from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [verificationRequired, setVerificationRequired] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,11 +32,10 @@ export default function SignupPage() {
         setSuccess(false);
       } else {
         setSuccess(true);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        // Redirect to verify page if verification required, else dashboard
         if (data.verification_required) {
-          window.location.href = "/auth/verify";
+          setVerificationRequired(true);
         } else {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
           window.location.href = "/dashboard";
         }
       }
@@ -46,6 +46,94 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
+
+  // Show verification modal after signup
+  if (verificationRequired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8 relative overflow-hidden" style={{ background: "var(--bg-primary)" }}>
+        <div className="absolute -top-1/4 -right-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.15)_0%,transparent_70%)] pointer-events-none" />
+        <div className="absolute -bottom-1/4 -left-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.1)_0%,transparent_70%)] pointer-events-none" />
+
+        <div className="w-full max-w-[480px] animate-fade-in">
+          {/* Verification Card */}
+          <div
+            className="rounded-2xl p-10 text-center relative overflow-hidden"
+            style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
+          >
+            {/* Decorative glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+            <div className="relative">
+              {/* Animated envelope icon */}
+              <div className="mx-auto mb-6 relative">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+                  <Mail size={36} className="text-indigo-400" />
+                </div>
+                <div className="absolute -top-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/30">
+                  <Sparkles size={14} className="text-white" />
+                </div>
+              </div>
+
+              <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
+                Check Your Inbox
+              </h1>
+              <p className="text-sm mb-1" style={{ color: "var(--text-secondary)" }}>
+                We&apos;ve sent a verification code to
+              </p>
+              <p className="text-base font-semibold mb-6" style={{ color: "var(--text-primary)" }}>
+                {email}
+              </p>
+
+              {/* Steps */}
+              <div
+                className="rounded-xl p-5 mb-6 text-left"
+                style={{ background: "var(--bg-primary)", border: "1px solid var(--border)" }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "var(--text-muted)" }}>
+                  Almost there — just one more step
+                </p>
+                <div className="space-y-3">
+                  {[
+                    { num: "1", text: "Open the email from AI Market", done: false },
+                    { num: "2", text: "Copy the 6-character verification code", done: false },
+                    { num: "3", text: "Enter it on the next page to activate your account", done: false },
+                  ].map((step) => (
+                    <div key={step.num} className="flex items-center gap-3">
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/10">
+                        <span className="text-xs font-bold text-indigo-400">{step.num}</span>
+                      </div>
+                      <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{step.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Security note */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <Shield size={14} className="text-emerald-400" />
+                <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Email verification keeps your account secure
+                </span>
+              </div>
+
+              {/* CTA */}
+              <Link
+                href="/auth/verify"
+                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl text-white font-semibold text-sm gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
+              >
+                Enter Verification Code
+                <ArrowRight size={16} />
+              </Link>
+
+              <p className="mt-4 text-xs" style={{ color: "var(--text-muted)" }}>
+                Didn&apos;t receive the email? Check your spam folder or resend from the verification page.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-8 relative overflow-hidden" style={{ background: "var(--bg-primary)" }}>
@@ -69,7 +157,7 @@ export default function SignupPage() {
         </div>
 
         {/* Success toast */}
-        {success && (
+        {success && !verificationRequired && (
           <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 mb-4 text-emerald-500 text-sm font-medium animate-fade-in">
             <CheckCircle size={18} />
             Account created! Signing you in...

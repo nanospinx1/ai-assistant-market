@@ -359,8 +359,8 @@ export default function HelpCenterPage() {
                 <MessageSquare size={16} />
                 Contact Support
               </Link>
-              <a
-                href="mailto:support@nanospinx.com"
+              <Link
+                href="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-3 text-sm font-semibold transition-colors hover:bg-[var(--bg-surface)]"
                 style={{
                   borderColor: "var(--border-light)",
@@ -368,8 +368,8 @@ export default function HelpCenterPage() {
                 }}
               >
                 <Mail size={16} />
-                support@nanospinx.com
-              </a>
+                Email Support
+              </Link>
             </div>
           </div>
         </div>

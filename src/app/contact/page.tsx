@@ -25,19 +25,19 @@ const contactMethods = [
     icon: DollarSign,
     title: "Sales",
     description: "Talk to our team about hiring AI employees for your business.",
-    email: "sales@nanospinx.com",
+    cta: "Talk to Sales",
   },
   {
     icon: Headphones,
     title: "Support",
     description: "Get help with your existing AI employees.",
-    email: "support@nanospinx.com",
+    cta: "Get Support",
   },
   {
     icon: Users,
     title: "Partnerships",
     description: "Explore partnership and integration opportunities.",
-    email: "partners@nanospinx.com",
+    cta: "Partner With Us",
   },
 ];
 
@@ -159,13 +159,12 @@ export default function ContactPage() {
                 <p className="text-sm mb-3" style={{ color: "var(--text-muted)" }}>
                   {method.description}
                 </p>
-                <a
-                  href={`mailto:${method.email}`}
-                  className="text-sm font-medium transition-colors hover:underline"
+                <span
+                  className="text-sm font-medium"
                   style={{ color: "var(--accent)" }}
                 >
-                  {method.email}
-                </a>
+                  {method.cta} →
+                </span>
               </div>
             );
           })}

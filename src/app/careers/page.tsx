@@ -372,104 +372,39 @@ export default function CareersPage() {
               className="mx-auto max-w-2xl text-lg"
               style={{ color: "var(--text-secondary)" }}
             >
-              Find your next role and help us reshape the future of work.
+              We don&apos;t have any open positions at the moment, but we&apos;re always on the lookout for exceptional talent. Check back soon or send us your resume.
             </p>
           </div>
 
-          <div className="mx-auto max-w-3xl space-y-4">
-            {openings.map((job) => (
-              <div
-                key={job.title}
-                className="group rounded-xl border p-6 transition-all hover:-translate-y-0.5 hover:shadow-lg flex items-center justify-between gap-4 flex-wrap"
-                style={{
-                  borderColor: "var(--border)",
-                  background: "var(--bg-card)",
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-                    <job.icon
-                      className="h-5 w-5"
-                      style={{ color: "var(--accent)" }}
-                    />
-                  </div>
-                  <div>
-                    <h3
-                      className="text-base font-bold"
-                      style={{ color: "var(--text-primary)" }}
-                    >
-                      {job.title}
-                    </h3>
-                    <div
-                      className="flex items-center gap-3 text-sm mt-1"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5" />
-                        {job.department}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {job.location}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        {job.type}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <a
-                  href={`mailto:careers@nanospinx.com?subject=Application: ${job.title}`}
-                  className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25 whitespace-nowrap"
-                >
-                  Apply
-                </a>
+          <div className="mx-auto max-w-lg text-center">
+            <div
+              className="rounded-2xl border p-10"
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--bg-card)",
+              }}
+            >
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+                <Mail className="h-7 w-7" style={{ color: "var(--accent)" }} />
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── CTA ─── */}
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div
-            className="relative overflow-hidden rounded-2xl border p-12 md:p-16 text-center"
-            style={{
-              borderColor: "var(--border)",
-              background: "var(--bg-surface)",
-            }}
-          >
-            <div className="pointer-events-none absolute top-0 left-1/3 h-64 w-64 rounded-full bg-purple-600/10 blur-3xl" />
-            <div className="pointer-events-none absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-indigo-600/8 blur-3xl" />
-
-            <div className="relative">
-              <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-                <Mail
-                  className="h-7 w-7"
-                  style={{ color: "var(--accent)" }}
-                />
-              </div>
-              <h2
-                className="mb-4 text-3xl font-bold md:text-4xl"
+              <h3
+                className="mb-2 text-lg font-bold"
                 style={{ color: "var(--text-primary)" }}
               >
-                Don&apos;t See Your Role?
-              </h2>
+                Stay Connected
+              </h3>
               <p
-                className="mx-auto mb-8 max-w-xl text-lg"
-                style={{ color: "var(--text-secondary)" }}
+                className="mb-6 text-sm leading-relaxed"
+                style={{ color: "var(--text-muted)" }}
               >
-                We&apos;re always looking for exceptional talent. Send us your
-                resume.
+                Interested in joining our team? Send your resume and we&apos;ll reach out when a role that fits your skills opens up.
               </p>
               <a
-                href="mailto:careers@nanospinx.com"
-                className="inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-base font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
               >
-                Get in Touch
-                <ArrowRight className="h-5 w-5" />
+                <Mail className="h-4 w-4" />
+                Send Your Resume
               </a>
             </div>
           </div>
