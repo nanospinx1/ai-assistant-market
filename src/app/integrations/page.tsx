@@ -131,7 +131,7 @@ interface KnowledgeEntry {
 export default function IntegrationsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<"tools" | "knowledge" | "apps">("tools");
+  const [activeSection, setActiveSection] = useState<"tools" | "knowledge" | "apps">("apps");
 
   // Tools state
   const [connections, setConnections] = useState<ToolConnection[]>([]);
@@ -253,9 +253,9 @@ export default function IntegrationsPage() {
       {/* Section tabs */}
       <div className="flex gap-1 p-1 rounded-xl mb-6" style={{ background: "var(--bg-tertiary)" }}>
         {([
+          { key: "apps" as const, label: "Apps", icon: LayoutGrid, count: null },
           { key: "tools" as const, label: "Connected Tools", icon: Plug, count: connections.length },
           { key: "knowledge" as const, label: "Knowledge Library", icon: BookOpen, count: knowledgeEntries.length },
-          { key: "apps" as const, label: "Apps", icon: LayoutGrid, count: null },
         ]).map(s => (
           <button
             key={s.key}
