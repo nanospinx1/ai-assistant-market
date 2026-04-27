@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useAuth } from "@/components/layout/Providers";
 import {
   Headphones,
   TrendingUp,
@@ -43,6 +44,7 @@ function getCategoryConfig(category: string) {
 }
 
 export default function MarketplacePage() {
+  const { user } = useAuth();
   const [employees, setEmployees] = useState<AIEmployee[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
@@ -251,7 +253,7 @@ export default function MarketplacePage() {
 
           {/* Build Your Own Custom Agent Card */}
           <Link
-            href="/auth/signup"
+            href={user ? "/custom-builder" : "/auth/signup"}
             className="card-hover group rounded-2xl bg-[var(--bg-card)] border-2 border-dashed border-[var(--border-light)] flex flex-col overflow-hidden items-center justify-center text-center animate-fade-in"
             style={{ animationDelay: `${filtered.length * 0.05}s`, minHeight: "280px" }}
           >
