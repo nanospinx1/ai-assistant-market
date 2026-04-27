@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Bot } from "lucide-react";
 
 export default function MarketplaceLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,9 +13,11 @@ export default function MarketplaceLayout({ children }: { children: React.ReactN
               <span>Back</span>
             </Link>
             <div className="h-5 w-px bg-[var(--border)]" />
-            <Link href="/" className="flex items-center gap-2 text-[var(--text-primary)] font-bold text-lg hover:opacity-80 transition-opacity">
-              <span className="text-xl">🤖</span>
-              <span>AI Market</span>
+            <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
+                <Bot className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-bold text-[var(--text-primary)]">AI Market</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
