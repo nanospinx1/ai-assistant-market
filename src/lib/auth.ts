@@ -12,10 +12,17 @@ export interface SessionUser {
   email: string;
   name: string;
   company?: string;
+  email_verified?: boolean;
 }
 
 export async function createSession(user: SessionUser) {
-  const token = await new SignJWT({ id: user.id, email: user.email, name: user.name, company: user.company })
+  const token = await new SignJWT({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    company: user.company,
+    email_verified: user.email_verified ?? false,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
     .sign(SECRET);
@@ -62,6 +69,24 @@ export async function requireAuth(): Promise<
     return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
   return { user };
+}
+
+/**
+ * Require authenticated AND email-verified user.
+ * Returns 403 if not verified.
+ */
+export async function requireVerified(): Promise<
+  { user: SessionUser; error?: never } | { user?: never; error: NextResponse }
+> {
+  const result = await requireAuth();
+  if (result.error) return result;
+  
+  // Check live verification status from DB
+  const { isEmailVerified } = await import("@/lib/repositories/users");
+  if (!isEmailVerified(result.user.id)) {
+    return { error: NextResponse.json({ error: "Email not verified" }, { status: 403 }) };
+  }
+  return result;
 }
 
 /**

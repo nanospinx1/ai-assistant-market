@@ -16,7 +16,7 @@ export function seedDatabase() {
     { id: uuid(), email: "jane@startup.io", name: "Jane Doe", password: bcryptjs.hashSync("demo123", 10), company: "StartupIO" },
   ];
 
-  const insertUser = db.prepare("INSERT INTO users (id, email, name, password, company) VALUES (?, ?, ?, ?, ?)");
+  const insertUser = db.prepare("INSERT INTO users (id, email, name, password, company, email_verified) VALUES (?, ?, ?, ?, ?, 1)");
   for (const user of demoUsers) {
     insertUser.run(user.id, user.email, user.name, user.password, user.company);
   }

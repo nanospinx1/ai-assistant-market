@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSession } from "@/lib/auth";
 import { seedDatabase } from "@/lib/seed";
 import * as UserRepo from "@/lib/repositories/users";
+import { sendVerificationEmail, isEmailConfigured } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +20,31 @@ export async function POST(req: NextRequest) {
     const hashedPassword = UserRepo.hashPassword(password);
     const id = require("uuid").v4();
     UserRepo.createUser(id, email, name, hashedPassword, company);
-    await createSession({ id, email, name, company });
+
+    // Generate verification code
+    const code = UserRepo.generateVerifyCode();
+    UserRepo.setVerifyCode(id, code);
+
+    // Send verification email (or auto-verify if email not configured)
+    let autoVerified = false;
+    if (isEmailConfigured()) {
+      try {
+        await sendVerificationEmail(email, code);
+      } catch (err) {
+        console.error("Failed to send verification email:", err);
+        // Still allow signup, user can resend later
+      }
+    } else {
+      // Dev mode: auto-verify when no email service
+      UserRepo.verifyEmail(id, code);
+      autoVerified = true;
+    }
+
+    await createSession({ id, email, name, company, email_verified: autoVerified });
 
     return NextResponse.json({
-      user: { id, email, name, company },
+      user: { id, email, name, company, email_verified: autoVerified },
+      verification_required: !autoVerified,
     });
   } catch (error) {
     console.error("Signup error:", error);

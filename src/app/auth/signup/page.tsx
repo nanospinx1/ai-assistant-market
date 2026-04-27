@@ -32,7 +32,12 @@ export default function SignupPage() {
       } else {
         setSuccess(true);
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        window.location.href = "/dashboard";
+        // Redirect to verify page if verification required, else dashboard
+        if (data.verification_required) {
+          window.location.href = "/auth/verify";
+        } else {
+          window.location.href = "/dashboard";
+        }
       }
     } catch {
       setError("Something went wrong. Please try again.");

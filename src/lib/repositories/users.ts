@@ -10,6 +10,9 @@ export interface UserRow {
   name: string;
   company: string | null;
   password: string;
+  email_verified: number;
+  verify_code: string | null;
+  verify_code_expires_at: string | null;
   created_at: string;
 }
 
@@ -86,4 +89,40 @@ export function verifyPassword(plain: string, hash: string): boolean {
 
 export function hashPassword(plain: string): string {
   return bcryptjs.hashSync(plain, 10);
+}
+
+/* ---- Email Verification ---- */
+
+export function generateVerifyCode(): string {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+export function setVerifyCode(userId: string, code: string): void {
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min
+  getDb().prepare(
+    "UPDATE users SET verify_code = ?, verify_code_expires_at = ?, email_verified = 0 WHERE id = ?"
+  ).run(code, expiresAt, userId);
+}
+
+export function verifyEmail(userId: string, code: string): boolean {
+  const user = getDb().prepare(
+    "SELECT verify_code, verify_code_expires_at FROM users WHERE id = ?"
+  ).get(userId) as { verify_code: string | null; verify_code_expires_at: string | null } | undefined;
+
+  if (!user || !user.verify_code || user.verify_code !== code) return false;
+
+  // Check expiry
+  if (user.verify_code_expires_at && new Date(user.verify_code_expires_at) < new Date()) {
+    return false;
+  }
+
+  getDb().prepare(
+    "UPDATE users SET email_verified = 1, verify_code = NULL, verify_code_expires_at = NULL WHERE id = ?"
+  ).run(userId);
+  return true;
+}
+
+export function isEmailVerified(userId: string): boolean {
+  const row = getDb().prepare("SELECT email_verified FROM users WHERE id = ?").get(userId) as { email_verified: number } | undefined;
+  return row?.email_verified === 1;
 }

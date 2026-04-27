@@ -131,7 +131,11 @@ export default function EmployeeDetailPage() {
   }, [id]);
 
   const handleHire = async () => {
-    if (!user || !employee) return;
+    if (!employee) return;
+    if (!user) {
+      router.push(`/auth/login?redirect=/marketplace/${employee.id}`);
+      return;
+    }
     setPurchasing(true);
     try {
       const res = await fetch("/api/purchases", {
@@ -435,7 +439,7 @@ export default function EmployeeDetailPage() {
             {/* CTA */}
             <button
               onClick={handleHire}
-              disabled={purchasing || !user}
+              disabled={purchasing}
               className={`w-full py-3.5 rounded-xl bg-gradient-to-r ${config.gradient} text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg animate-pulse-glow`}
             >
               {purchasing

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { seedDatabase } from "@/lib/seed";
+import * as UserRepo from "@/lib/repositories/users";
 
 export async function GET() {
   seedDatabase();
@@ -8,5 +9,9 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ user: null });
   }
-  return NextResponse.json({ user: session });
+  // Hydrate email_verified from DB (not stale JWT)
+  const verified = UserRepo.isEmailVerified(session.id);
+  return NextResponse.json({
+    user: { ...session, email_verified: verified },
+  });
 }

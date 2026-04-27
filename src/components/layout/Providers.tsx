@@ -7,6 +7,7 @@ interface User {
   email: string;
   name: string;
   company?: string;
+  email_verified?: boolean;
 }
 
 interface AuthContextType {
