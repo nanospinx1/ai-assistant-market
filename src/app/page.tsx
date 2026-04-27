@@ -1020,24 +1020,24 @@ export default function Home() {
               {
                 heading: "Company",
                 links: [
-                  { label: "About", href: "#" },
-                  { label: "Careers", href: "#" },
-                  { label: "Blog", href: "#" },
+                  { label: "About", href: "/about" },
+                  { label: "Careers", href: "/careers" },
+                  { label: "Blog", href: "/blog" },
                 ],
               },
               {
                 heading: "Support",
                 links: [
-                  { label: "Help Center", href: "#" },
-                  { label: "Documentation", href: "#" },
-                  { label: "Contact Us", href: "#" },
+                  { label: "Help Center", href: "/help" },
+                  { label: "Documentation", href: "/docs" },
+                  { label: "Contact Us", href: "/contact" },
                 ],
               },
               {
                 heading: "Legal",
                 links: [
-                  { label: "Privacy Policy", href: "#" },
-                  { label: "Terms of Service", href: "#" },
+                  { label: "Privacy Policy", href: "/privacy" },
+                  { label: "Terms of Service", href: "/terms" },
                 ],
               },
             ].map((col) => (
