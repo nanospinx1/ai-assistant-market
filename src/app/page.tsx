@@ -22,6 +22,8 @@ import {
   Play,
   Sparkles,
   Building2,
+  PlusCircle,
+  Wrench,
   Globe,
   Sun,
   Moon,
@@ -568,7 +570,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {featuredEmployees.map((emp) => (
               <div
                 key={emp.name}
@@ -651,6 +653,42 @@ export default function Home() {
                 </div>
               </div>
             ))}
+
+            {/* Custom Agent Build Card */}
+            <Link
+              href="/marketplace"
+              className="card-hover group relative overflow-hidden rounded-2xl flex flex-col items-center justify-center text-center"
+              style={{ background: "var(--bg-card)", border: "2px dashed var(--border-light)" }}
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "linear-gradient(135deg, rgba(79,70,229,0.05), rgba(16,185,129,0.05))" }} />
+              <div className="relative p-6 flex flex-col items-center gap-4">
+                <div
+                  className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 border-2 border-dashed shadow-lg transition-transform group-hover:scale-110"
+                  style={{ borderColor: "var(--primary-light)" }}
+                >
+                  <PlusCircle className="h-8 w-8" style={{ color: "var(--primary-light)" }} />
+                </div>
+                <div>
+                  <h3
+                    className="mb-1 text-lg font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    Build Your Own
+                  </h3>
+                  <p
+                    className="mb-4 text-sm leading-relaxed"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    Create a custom AI employee tailored to your unique business needs
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm font-semibold transition-colors" style={{ color: "var(--primary-light)" }}>
+                  <Wrench className="h-4 w-4" />
+                  Start Building
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
