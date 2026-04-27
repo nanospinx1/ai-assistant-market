@@ -951,7 +951,7 @@ export default function Home() {
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href="#"
+              href="/demo"
               className="inline-flex items-center gap-2 rounded-lg border px-8 py-3.5 text-sm font-semibold transition-colors hover:bg-white/5"
               style={{
                 borderColor: "var(--border-light)",
