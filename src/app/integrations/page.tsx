@@ -794,6 +794,7 @@ interface AppItem {
   gradient: string;
   logo?: string;
   popular?: boolean;
+  available?: boolean;
 }
 
 const APPS_CATALOG: AppItem[] = [
@@ -807,13 +808,13 @@ const APPS_CATALOG: AppItem[] = [
   { id: "freshdesk", name: "Freshdesk", description: "Helpdesk and customer support ticketing", category: "Support", icon: Headphones, gradient: "from-[#25C16F] to-[#1BAA5A]", logo: "/logos/freshdesk.svg" },
   { id: "freshsales", name: "Freshsales", description: "AI-powered CRM for high-velocity sales teams", category: "CRM & Sales", icon: Zap, gradient: "from-[#F36C3D] to-[#E8570E]" },
   { id: "github", name: "GitHub", description: "Code hosting, version control, and CI/CD", category: "Development", icon: Globe, gradient: "from-[#24292E] to-[#586069]", logo: "/logos/github.svg" },
-  { id: "gmail", name: "Gmail", description: "Email integration for sending and receiving messages", category: "Communication", icon: Mail, gradient: "from-[#EA4335] to-[#FBBC04]", logo: "/logos/gmail.svg", popular: true },
+  { id: "gmail", name: "Gmail", description: "Email integration for sending and receiving messages", category: "Communication", icon: Mail, gradient: "from-[#EA4335] to-[#FBBC04]", logo: "/logos/gmail.svg", popular: true, available: true },
   { id: "google-ads", name: "Google Ads", description: "Search and display advertising management", category: "Marketing", icon: TrendingUp, gradient: "from-[#4285F4] to-[#EA4335]", logo: "/logos/googleads.svg" },
   { id: "google-analytics", name: "Google Analytics", description: "Website and app analytics and reporting", category: "Analytics", icon: BarChart3, gradient: "from-[#F9AB00] to-[#E37400]", logo: "/logos/googleanalytics.svg" },
-  { id: "google-drive", name: "Google Drive", description: "Cloud storage and file sharing", category: "Storage", icon: HardDrive, gradient: "from-[#4285F4] to-[#0F9D58]", logo: "/logos/googledrive.svg" },
-  { id: "google-workspace", name: "Google Workspace", description: "Docs, Sheets, Drive, and Calendar suite", category: "Productivity", icon: Globe, gradient: "from-[#4285F4] to-[#34A853]", logo: "/logos/google.svg", popular: true },
+  { id: "google-drive", name: "Google Drive", description: "Cloud storage and file sharing", category: "Storage", icon: HardDrive, gradient: "from-[#4285F4] to-[#0F9D58]", logo: "/logos/googledrive.svg", available: true },
+  { id: "google-workspace", name: "Google Workspace", description: "Docs, Sheets, Drive, and Calendar suite", category: "Productivity", icon: Globe, gradient: "from-[#4285F4] to-[#34A853]", logo: "/logos/google.svg", popular: true, available: true },
   { id: "hootsuite", name: "Hootsuite", description: "Unified social media management and scheduling dashboard", category: "Social Media", icon: Clock, gradient: "from-[#143059] to-[#1D4D80]", logo: "/logos/hootsuite.svg" },
-  { id: "hubspot", name: "HubSpot", description: "Inbound marketing, sales, and CRM software", category: "CRM & Sales", icon: Database, gradient: "from-[#FF7A59] to-[#FF5C35]", logo: "/logos/hubspot.svg", popular: true },
+  { id: "hubspot", name: "HubSpot", description: "Inbound marketing, sales, and CRM software", category: "CRM & Sales", icon: Database, gradient: "from-[#FF7A59] to-[#FF5C35]", logo: "/logos/hubspot.svg", popular: true, available: true },
   { id: "instagram", name: "Instagram", description: "Content publishing, stories, reels, and engagement tracking", category: "Social Media", icon: Smartphone, gradient: "from-[#F58529] to-[#DD2A7B]", logo: "/logos/instagram.svg", popular: true },
   { id: "intercom", name: "Intercom", description: "Conversational support and customer messaging", category: "Support", icon: MessageSquare, gradient: "from-[#286EFA] to-[#6AFDEF]", logo: "/logos/intercom.svg" },
   { id: "jira", name: "Jira", description: "Issue tracking and agile project management", category: "Productivity", icon: Settings, gradient: "from-[#0052CC] to-[#2684FF]", logo: "/logos/jira.svg" },
@@ -823,7 +824,7 @@ const APPS_CATALOG: AppItem[] = [
   { id: "teams", name: "Microsoft Teams", description: "Chat, video meetings, and collaboration hub", category: "Communication", icon: Users, gradient: "from-[#464EB8] to-[#5B5FC7]", logo: "/logos/microsoftteams.svg", popular: true },
   { id: "mixpanel", name: "Mixpanel", description: "Product analytics and user behavior tracking", category: "Analytics", icon: BarChart3, gradient: "from-[#7856FF] to-[#4F46E5]", logo: "/logos/mixpanel.svg" },
   { id: "monday", name: "Monday.com", description: "Work OS for managing workflows and projects", category: "Productivity", icon: Calendar, gradient: "from-[#FF3D57] to-[#FFCB00]", logo: "/logos/mondaydotcom.svg" },
-  { id: "notion", name: "Notion", description: "All-in-one workspace for notes, docs, and projects", category: "Productivity", icon: FileText, gradient: "from-[#000000] to-[#333333]", logo: "/logos/notion.svg", popular: true },
+  { id: "notion", name: "Notion", description: "All-in-one workspace for notes, docs, and projects", category: "Productivity", icon: FileText, gradient: "from-[#000000] to-[#333333]", logo: "/logos/notion.svg", popular: true, available: true },
   { id: "onedrive", name: "OneDrive", description: "Microsoft cloud storage integration", category: "Storage", icon: HardDrive, gradient: "from-[#0078D4] to-[#28A8EA]", logo: "/logos/microsoftonedrive.svg" },
   { id: "outlook", name: "Outlook", description: "Microsoft email, calendar, and contacts", category: "Communication", icon: Mail, gradient: "from-[#0078D4] to-[#28A8EA]", logo: "/logos/microsoftoutlook.svg" },
   { id: "paypal", name: "PayPal", description: "Online payment platform and transactions", category: "Finance", icon: CreditCard, gradient: "from-[#003087] to-[#009CDE]", logo: "/logos/paypal.svg" },
@@ -831,16 +832,16 @@ const APPS_CATALOG: AppItem[] = [
   { id: "pipedrive", name: "Pipedrive", description: "Sales pipeline management and deal tracking", category: "CRM & Sales", icon: BarChart3, gradient: "from-[#017737] to-[#25C16F]", logo: "/logos/pipedrive.svg" },
   { id: "quickbooks", name: "QuickBooks", description: "Accounting, invoicing, and financial reporting", category: "Finance", icon: CreditCard, gradient: "from-[#2CA01C] to-[#108208]", logo: "/logos/quickbooks.svg", popular: true },
   { id: "rest-api", name: "REST API", description: "Integrate with any REST API endpoint", category: "Development", icon: Globe, gradient: "from-[#059669] to-[#10B981]" },
-  { id: "salesforce", name: "Salesforce", description: "CRM platform for sales, service, and marketing", category: "CRM & Sales", icon: TrendingUp, gradient: "from-[#00A1E0] to-[#1798c1]", logo: "/logos/salesforce.svg", popular: true },
-  { id: "slack", name: "Slack", description: "Team messaging, channels, and real-time notifications", category: "Communication", icon: MessageSquare, gradient: "from-[#4A154B] to-[#611f69]", logo: "/logos/slack.svg", popular: true },
-  { id: "stripe", name: "Stripe", description: "Payment processing and subscription billing", category: "Finance", icon: CreditCard, gradient: "from-[#635BFF] to-[#A259FF]", logo: "/logos/stripe.svg", popular: true },
+  { id: "salesforce", name: "Salesforce", description: "CRM platform for sales, service, and marketing", category: "CRM & Sales", icon: TrendingUp, gradient: "from-[#00A1E0] to-[#1798c1]", logo: "/logos/salesforce.svg", popular: true, available: true },
+  { id: "slack", name: "Slack", description: "Team messaging, channels, and real-time notifications", category: "Communication", icon: MessageSquare, gradient: "from-[#4A154B] to-[#611f69]", logo: "/logos/slack.svg", popular: true, available: true },
+  { id: "stripe", name: "Stripe", description: "Payment processing and subscription billing", category: "Finance", icon: CreditCard, gradient: "from-[#635BFF] to-[#A259FF]", logo: "/logos/stripe.svg", popular: true, available: true },
   { id: "tableau", name: "Tableau", description: "Data visualization and business intelligence", category: "Analytics", icon: BarChart3, gradient: "from-[#E97627] to-[#C72037]", logo: "/logos/tableau.svg" },
   { id: "tiktok", name: "TikTok", description: "Short-form video publishing, trends, and ad management", category: "Social Media", icon: Video, gradient: "from-[#010101] to-[#69C9D0]", logo: "/logos/tiktok.svg" },
-  { id: "trello", name: "Trello", description: "Visual project management with boards and cards", category: "Productivity", icon: LayoutGrid, gradient: "from-[#0052CC] to-[#0079BF]", logo: "/logos/trello.svg" },
+  { id: "trello", name: "Trello", description: "Visual project management with boards and cards", category: "Productivity", icon: LayoutGrid, gradient: "from-[#0052CC] to-[#0079BF]", logo: "/logos/trello.svg", available: true },
   { id: "x-twitter", name: "X (Twitter)", description: "Tweet scheduling, mentions monitoring, and trend analytics", category: "Social Media", icon: MessageSquare, gradient: "from-[#000000] to-[#333333]", logo: "/logos/x.svg", popular: true },
   { id: "xero", name: "Xero", description: "Cloud-based accounting and bookkeeping", category: "Finance", icon: FileSpreadsheet, gradient: "from-[#13B5EA] to-[#0D87B5]", logo: "/logos/xero.svg" },
   { id: "youtube", name: "YouTube", description: "Video publishing, channel management, and audience analytics", category: "Social Media", icon: Video, gradient: "from-[#FF0000] to-[#CC0000]", logo: "/logos/youtube.svg" },
-  { id: "zapier", name: "Zapier", description: "Automate workflows between 5,000+ apps", category: "Development", icon: Zap, gradient: "from-[#FF4A00] to-[#FF6D36]", logo: "/logos/zapier.svg" },
+  { id: "zapier", name: "Zapier", description: "Automate workflows between 5,000+ apps", category: "Development", icon: Zap, gradient: "from-[#FF4A00] to-[#FF6D36]", logo: "/logos/zapier.svg", available: true },
   { id: "zendesk", name: "Zendesk", description: "Customer service and ticketing platform", category: "Support", icon: Headphones, gradient: "from-[#03363D] to-[#17494D]", logo: "/logos/zendesk.svg", popular: true },
   { id: "zoom", name: "Zoom", description: "Video conferencing and meeting scheduling", category: "Communication", icon: Video, gradient: "from-[#2D8CFF] to-[#0B5CFF]", logo: "/logos/zoom.svg" },
 ];
@@ -931,11 +932,12 @@ function AppsDirectory() {
             {popularApps.map(app => {
               const isConnected = connectedApps.has(app.id);
               const isConnecting = connectingApp === app.id;
+              const comingSoon = !app.available;
               return (
                 <div key={app.id} className="rounded-xl p-4 flex flex-col gap-3 group transition-all hover:shadow-md"
-                  style={{ background: "var(--bg-card)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.4)" : "var(--border-primary)"}` }}>
+                  style={{ background: "var(--bg-card)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.4)" : "var(--border-primary)"}`, opacity: comingSoon ? 0.6 : 1 }}>
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${app.gradient} flex items-center justify-center shrink-0`}>
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${app.gradient} flex items-center justify-center shrink-0`} style={comingSoon ? { filter: "grayscale(0.5)" } : {}}>
                       <AppIcon app={app} />
                     </div>
                     <div className="min-w-0">
@@ -944,13 +946,20 @@ function AppsDirectory() {
                     </div>
                   </div>
                   <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "var(--text-secondary)" }}>{app.description}</p>
-                  <button onClick={() => handleConnect(app.id)} disabled={isConnecting}
-                    className="mt-auto w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
-                    style={{ background: isConnected ? "rgba(34,197,94,0.12)" : "rgba(79,70,229,0.1)", color: isConnected ? "#22C55E" : "var(--primary)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.3)" : "rgba(79,70,229,0.2)"}` }}>
-                    {isConnecting ? (<><div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" /> Connecting...</>)
-                      : isConnected ? (<><CheckCircle size={13} /> Connected</>)
-                      : (<><Plus size={13} /> Connect</>)}
-                  </button>
+                  {comingSoon ? (
+                    <button disabled className="mt-auto w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-not-allowed"
+                      style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)", border: "1px solid var(--border-primary)" }}>
+                      <Clock size={13} /> Coming Soon
+                    </button>
+                  ) : (
+                    <button onClick={() => handleConnect(app.id)} disabled={isConnecting}
+                      className="mt-auto w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
+                      style={{ background: isConnected ? "rgba(34,197,94,0.12)" : "rgba(79,70,229,0.1)", color: isConnected ? "#22C55E" : "var(--primary)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.3)" : "rgba(79,70,229,0.2)"}` }}>
+                      {isConnecting ? (<><div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" /> Connecting...</>)
+                        : isConnected ? (<><CheckCircle size={13} /> Connected</>)
+                        : (<><Plus size={13} /> Connect</>)}
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -977,17 +986,21 @@ function AppsDirectory() {
             {filtered.map(app => {
               const isConnected = connectedApps.has(app.id);
               const isConnecting = connectingApp === app.id;
+              const comingSoon = !app.available;
               return (
                 <div key={app.id} className="rounded-xl p-4 flex flex-col gap-3 group transition-all hover:shadow-md"
-                  style={{ background: "var(--bg-card)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.4)" : "var(--border-primary)"}` }}>
+                  style={{ background: "var(--bg-card)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.4)" : "var(--border-primary)"}`, opacity: comingSoon ? 0.6 : 1 }}>
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${app.gradient} flex items-center justify-center shrink-0`}>
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${app.gradient} flex items-center justify-center shrink-0`} style={comingSoon ? { filter: "grayscale(0.5)" } : {}}>
                       <AppIcon app={app} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <p className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>{app.name}</p>
-                        {app.popular && (
+                        {comingSoon && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium shrink-0" style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)", border: "1px solid var(--border-primary)" }}>Soon</span>
+                        )}
+                        {app.popular && !comingSoon && (
                           <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium shrink-0" style={{ background: "rgba(251,191,36,0.15)", color: "#F59E0B" }}>Popular</span>
                         )}
                       </div>
@@ -996,13 +1009,20 @@ function AppsDirectory() {
                     {isConnected && <CheckCircle size={14} className="shrink-0 text-green-500" />}
                   </div>
                   <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "var(--text-secondary)" }}>{app.description}</p>
-                  <button onClick={() => handleConnect(app.id)} disabled={isConnecting}
-                    className="mt-auto w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
-                    style={{ background: isConnected ? "rgba(34,197,94,0.12)" : "rgba(79,70,229,0.1)", color: isConnected ? "#22C55E" : "var(--primary)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.3)" : "rgba(79,70,229,0.2)"}` }}>
-                    {isConnecting ? (<><div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" /> Connecting...</>)
-                      : isConnected ? (<><CheckCircle size={13} /> Connected</>)
-                      : (<><Plus size={13} /> Connect</>)}
-                  </button>
+                  {comingSoon ? (
+                    <button disabled className="mt-auto w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-not-allowed"
+                      style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)", border: "1px solid var(--border-primary)" }}>
+                      <Clock size={13} /> Coming Soon
+                    </button>
+                  ) : (
+                    <button onClick={() => handleConnect(app.id)} disabled={isConnecting}
+                      className="mt-auto w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
+                      style={{ background: isConnected ? "rgba(34,197,94,0.12)" : "rgba(79,70,229,0.1)", color: isConnected ? "#22C55E" : "var(--primary)", border: `1px solid ${isConnected ? "rgba(34,197,94,0.3)" : "rgba(79,70,229,0.2)"}` }}>
+                      {isConnecting ? (<><div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" /> Connecting...</>)
+                        : isConnected ? (<><CheckCircle size={13} /> Connected</>)
+                        : (<><Plus size={13} /> Connect</>)}
+                    </button>
+                  )}
                 </div>
               );
             })}
