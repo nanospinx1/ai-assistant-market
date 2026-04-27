@@ -212,7 +212,7 @@ export default function Home() {
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <Link
-              href="/auth/register"
+              href="/auth/signup"
               className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
             >
               Get Started
@@ -862,7 +862,7 @@ export default function Home() {
           </div>
 
           <Link
-            href="/auth/register"
+            href="/auth/signup"
             className="inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-sm font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
           >
             Start Free Trial
@@ -901,7 +901,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/auth/register"
+              href="/auth/signup"
               className="inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-sm font-semibold text-white gradient-primary transition-shadow hover:shadow-lg hover:shadow-indigo-500/25"
             >
               Start Free Trial
