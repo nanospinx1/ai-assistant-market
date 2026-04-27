@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   const approvals = rows.map((r: any) => ({
     ...r,
-    payload: JSON.parse(r.payload || r.metadata || "{}"),
+    payload: JSON.parse(r.payload || "{}"),
   }));
 
   return NextResponse.json({ approvals });

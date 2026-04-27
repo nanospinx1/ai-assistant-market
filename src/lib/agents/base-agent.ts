@@ -279,7 +279,7 @@ export class BaseAgent {
       .prepare("SELECT default_model FROM deployments WHERE id = ?")
       .get(this.config.deploymentId) as any;
 
-    return deployment?.default_model || "gpt-4o-mini";
+    return deployment?.default_model || process.env.LLM_MODEL || "llama-3.3-70b-versatile";
   }
 
   /**

@@ -143,7 +143,7 @@ export default function DashboardPage() {
             const p = perf.find?.((p: any) => (p.deploymentId || p.deployment_id) === d.id);
             return {
               ...d,
-              accuracy: p?.avgAccuracy ?? p?.avg_accuracy ?? 0,
+              accuracy: Math.round(p?.avgAccuracy ?? p?.avg_accuracy ?? 0),
               tasksCompleted: Math.round(p?.avgTasks ?? p?.avg_tasks ?? 0),
               uptime: `${(p?.avgUptime ?? p?.avg_uptime ?? 0).toFixed(1)}%`,
             };

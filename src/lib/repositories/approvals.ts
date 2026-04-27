@@ -1,5 +1,7 @@
 /**
  * Approval requests repository — approval_requests table.
+ * Schema columns: id, deployment_id, user_id, tool_name, action, title,
+ *   description, payload, status, decided_at, decision_note, expires_at, created_at
  */
 import { getDb } from "@/lib/db";
 import { v4 as uuid } from "uuid";
@@ -10,13 +12,14 @@ export interface ApprovalRow {
   id: string;
   deployment_id: string;
   user_id: string;
-  type: string;
+  tool_name: string;
+  action: string;
   title: string;
   description: string | null;
-  metadata: string | null;
+  payload: string | null;
   status: ApprovalStatus;
-  reviewer_note: string | null;
-  reviewed_at: string | null;
+  decision_note: string | null;
+  decided_at: string | null;
   expires_at: string | null;
   created_at: string;
 }
@@ -63,31 +66,32 @@ export function countByStatus(userId: string) {
 export function create(params: {
   deploymentId: string;
   userId: string;
-  type: string;
+  toolName: string;
+  action: string;
   title: string;
   description?: string;
-  metadata?: Record<string, unknown>;
+  payload?: Record<string, unknown>;
   expiresAt?: string;
 }): string {
   const id = uuid();
   getDb().prepare(`
-    INSERT INTO approval_requests (id, deployment_id, user_id, type, title, description, metadata, expires_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO approval_requests (id, deployment_id, user_id, tool_name, action, title, description, payload, expires_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
-    id, params.deploymentId, params.userId, params.type, params.title,
+    id, params.deploymentId, params.userId, params.toolName, params.action, params.title,
     params.description ?? null,
-    params.metadata ? JSON.stringify(params.metadata) : null,
+    params.payload ? JSON.stringify(params.payload) : null,
     params.expiresAt ?? null,
   );
   return id;
 }
 
-export function updateStatus(id: string, status: ApprovalStatus, reviewerNote?: string): boolean {
+export function updateStatus(id: string, status: ApprovalStatus, decisionNote?: string): boolean {
   const result = getDb().prepare(`
     UPDATE approval_requests
-    SET status = ?, reviewer_note = ?, reviewed_at = datetime('now')
+    SET status = ?, decision_note = ?, decided_at = datetime('now')
     WHERE id = ?
-  `).run(status, reviewerNote ?? null, id);
+  `).run(status, decisionNote ?? null, id);
   return result.changes > 0;
 }
 
@@ -102,17 +106,8 @@ export function expirePending(): number {
 }
 
 /** Check whether a deployment action needs approval. */
-export function checkRequired(deploymentId: string, action: string): boolean {
-  const db = getDb();
-  const settings = db
-    .prepare("SELECT value FROM user_settings WHERE key = 'approval_settings' AND user_id = (SELECT user_id FROM deployments WHERE id = ?)")
-    .get(deploymentId) as { value: string } | undefined;
-  if (!settings) return false;
-  try {
-    const cfg = JSON.parse(settings.value);
-    if (!cfg.enabled) return false;
-    return cfg.actions?.includes(action) ?? false;
-  } catch {
-    return false;
-  }
+export function checkRequired(_deploymentId: string, _action: string): boolean {
+  // Approval settings are not yet stored in user_settings.
+  // Return false (no approval required) until this feature is built out.
+  return false;
 }

@@ -102,12 +102,12 @@ export function recommendModel(input: RecommendationInput): ModelRecommendation 
   reasoning.push(`Recommended tier: ${TIER_INFO[tier].label} — ${TIER_INFO[tier].description}`);
 
   // Pick the best available model for this tier
-  // Since we have 2 models available, route: nano+mini → gpt-4o-mini, standard+ → gpt-4o
+  // Route: nano+mini → llama-3.1-8b-instant (fast), standard+ → llama-3.3-70b-versatile (powerful)
   let selectedModel: ModelConfig;
   if (tier === "nano" || tier === "mini") {
-    selectedModel = MODEL_REGISTRY["gpt-4o-mini"];
+    selectedModel = MODEL_REGISTRY["llama-3.1-8b-instant"];
   } else {
-    selectedModel = MODEL_REGISTRY["gpt-4o"];
+    selectedModel = MODEL_REGISTRY["llama-3.3-70b-versatile"];
   }
 
   return buildRecommendation(selectedModel, tier, totalScore, reasoning);

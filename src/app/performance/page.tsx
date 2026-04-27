@@ -179,22 +179,22 @@ function PerformanceRow({ dep, expanded, onExpand, chartLoading, chartData }: {
         </div>
         <div className="hidden sm:flex items-center gap-8 text-sm">
           <div className="text-center min-w-[60px]">
-            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgTasks}</p>
+            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{Math.round(dep.avgTasks || 0)}</p>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>Tasks/day</p>
           </div>
           <div className="text-center min-w-[70px]">
-            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{dep.avgResponseTime}</p>
+            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{(dep.avgResponseTime || 0).toFixed(1)}s</p>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>Resp. Time</p>
           </div>
           <div className="text-center min-w-[60px]">
             <p className={`font-semibold ${colorForPercent(dep.avgAccuracy)}`}>
-              {dep.avgAccuracy}%
+              {(dep.avgAccuracy || 0).toFixed(1)}%
             </p>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>Accuracy</p>
           </div>
           <div className="text-center min-w-[60px]">
             <p className={`font-semibold ${colorForPercent(dep.avgUptime)}`}>
-              {dep.avgUptime}%
+              {(dep.avgUptime || 0).toFixed(1)}%
             </p>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>Uptime</p>
           </div>

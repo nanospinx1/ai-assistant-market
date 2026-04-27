@@ -352,7 +352,7 @@ export async function POST(req: NextRequest) {
 
     const llm = getLLMProvider();
     const response = await llm.generate(fullMessages, {
-      model: "gpt-4o-mini",
+      // model resolved by the LLM provider's default
       temperature: 0.7,
       maxTokens: 4096,
       ...(tools.length ? { tools } : {}),
