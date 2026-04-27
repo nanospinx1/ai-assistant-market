@@ -3,7 +3,7 @@ services:
     name: ai-assistant-market
     runtime: node
     plan: starter
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm run build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/
     startCommand: node .next/standalone/server.js
     envVars:
       - key: NODE_ENV
@@ -13,13 +13,13 @@ services:
       - key: AUTH_SECRET
         generateValue: true
       - key: LLM_PROVIDER
-        value: azure-openai
-      - key: AZURE_OPENAI_ENDPOINT
+        value: groq
+      - key: LLM_API_KEY
         sync: false
-      - key: AZURE_OPENAI_API_KEY_PRIMARY
-        sync: false
-      - key: AZURE_OPENAI_API_KEY_SECONDARY
-        sync: false
+      - key: LLM_API_BASE
+        value: https://api.groq.com/openai/v1
+      - key: LLM_MODEL
+        value: llama-3.3-70b-versatile
     disk:
       name: sqlite-data
       mountPath: /opt/render/project/src/data
