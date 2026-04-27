@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ai-assistant-market
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: node .next/standalone/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: LLM_PROVIDER
+        value: azure-openai
+      - key: AZURE_OPENAI_ENDPOINT
+        sync: false
+      - key: AZURE_OPENAI_API_KEY_PRIMARY
+        sync: false
+      - key: AZURE_OPENAI_API_KEY_SECONDARY
+        sync: false
+    disk:
+      name: sqlite-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
