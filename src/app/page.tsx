@@ -540,6 +540,21 @@ export default function Home() {
               );
             })}
           </div>
+
+          {/* Request a Demo CTA */}
+          <div className="mt-10 text-center">
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 rounded-lg border px-8 py-3.5 text-sm font-semibold transition-colors hover:bg-white/5"
+              style={{
+                borderColor: "var(--border-light)",
+                color: "var(--text-primary)",
+              }}
+            >
+              <Play className="h-4 w-4" style={{ color: "var(--primary-light)" }} />
+              Request a Demo
+            </Link>
+          </div>
         </div>
       </section>
 
