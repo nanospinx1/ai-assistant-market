@@ -1,10 +1,42 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft, Bot } from "lucide-react";
+import { useAuth } from "@/components/layout/Providers";
+import Sidebar from "@/components/layout/Sidebar";
+import { AIAssistantProvider } from "@/contexts/AIAssistantContext";
+import GlobalAIPanel from "@/components/GlobalAIPanel";
 
 export default function MarketplaceLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  // Loading state — brief flash guard
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)]">
+        <main className="max-w-7xl mx-auto px-6 py-8">{children}</main>
+      </div>
+    );
+  }
+
+  // Authenticated: show within sidebar layout
+  if (user) {
+    return (
+      <AIAssistantProvider>
+        <div className="min-h-screen">
+          <Sidebar />
+          <main className="lg:ml-64 min-h-screen">
+            <div className="max-w-7xl mx-auto px-6 py-8 pt-16 lg:pt-8">{children}</div>
+          </main>
+        </div>
+        <GlobalAIPanel />
+      </AIAssistantProvider>
+    );
+  }
+
+  // Public: show standalone header
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
-      {/* Simple top nav for public marketplace */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--bg-primary)]/80 border-b border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
