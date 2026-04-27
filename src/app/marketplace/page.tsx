@@ -18,6 +18,8 @@ import {
   ArrowRight,
   SlidersHorizontal,
   Globe,
+  PlusCircle,
+  Wrench,
 } from "lucide-react";
 import { AIEmployee } from "@/lib/types";
 import { categories } from "@/data/employees";
@@ -246,6 +248,34 @@ export default function MarketplacePage() {
               </Link>
             );
           })}
+
+          {/* Build Your Own Custom Agent Card */}
+          <Link
+            href="/auth/signup"
+            className="card-hover group rounded-2xl bg-[var(--bg-card)] border-2 border-dashed border-[var(--border-light)] flex flex-col overflow-hidden items-center justify-center text-center animate-fade-in"
+            style={{ animationDelay: `${filtered.length * 0.05}s`, minHeight: "280px" }}
+          >
+            <div className="relative p-6 flex flex-col items-center gap-4">
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 border-2 border-dashed border-[var(--primary-light)] shadow-lg transition-transform group-hover:scale-110"
+              >
+                <PlusCircle size={28} className="text-[var(--primary-light)]" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1 group-hover:text-[var(--primary)] transition-colors">
+                  Build Your Own
+                </h3>
+                <p className="text-sm text-[var(--text-muted)] mb-4 leading-relaxed">
+                  Create a custom AI employee tailored to your unique business needs
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--primary)] group-hover:text-[var(--primary-light)] transition-colors">
+                <Wrench size={14} />
+                Start Building
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </span>
+            </div>
+          </Link>
         </div>
       )}
     </div>
