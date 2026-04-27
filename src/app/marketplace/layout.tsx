@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function MarketplaceLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,10 +7,17 @@ export default function MarketplaceLayout({ children }: { children: React.ReactN
       {/* Simple top nav for public marketplace */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--bg-primary)]/80 border-b border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-[var(--text-primary)] font-bold text-lg hover:opacity-80 transition-opacity">
-            <span className="text-xl">🤖</span>
-            <span>AI Assistant Market</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+              <ArrowLeft size={16} />
+              <span>Back</span>
+            </Link>
+            <div className="h-5 w-px bg-[var(--border)]" />
+            <Link href="/" className="flex items-center gap-2 text-[var(--text-primary)] font-bold text-lg hover:opacity-80 transition-opacity">
+              <span className="text-xl">🤖</span>
+              <span>AI Market</span>
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <Link
               href="/login"
